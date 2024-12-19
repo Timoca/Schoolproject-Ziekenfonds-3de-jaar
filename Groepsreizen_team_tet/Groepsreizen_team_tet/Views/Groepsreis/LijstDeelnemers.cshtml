@@ -1,0 +1,49 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisDeelnemersViewModel
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header text-white">
+            <h2>Deelnemerslijst voor @Model.BestemmingNaam</h2>
+            <p><strong>Aantal deelnemers:</strong> @Model.AantalDeelnemers</p>
+
+            @if (Model.HuidigeDeelnemers.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr class="table-info">
+                                <th>Naam</th>
+                                <th>Leeftijd</th>
+                                <th>Telefoonnummer Ouder / Voogd</th>
+                                <th>Medicatie</th>
+                                <th>Allergieën</th>
+                                <th>Opmerkingen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var deelnemer in Model.HuidigeDeelnemers)
+                            {
+                                <tr>
+                                    <td>@deelnemer.KindNaam</td>
+                                    <td>@deelnemer.Leeftijd jaar</td>
+                                    <td>@deelnemer.OuderTelefoonnummer</td>
+                                    <td>@(deelnemer.Medicatie != "" ? deelnemer.Medicatie : "Geen gegevens")</td>
+                                    <td>@(deelnemer.Allergieën != "" ? deelnemer.Allergieën : "Geen gegevens")</td>
+                                    <td>@(deelnemer.Opmerkingen != "" ? deelnemer.Opmerkingen : "Geen opmerkingen")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Er zijn momenteel geen deelnemers voor deze groepsreis.</p>
+            }
+        </div>
+    </div>
+    <!-- Terug knop-->
+    <div class="mt-4">
+        <button onclick="window.history.back()" class="btn btn-secondary">Terug</button>
+    </div>
+</div>

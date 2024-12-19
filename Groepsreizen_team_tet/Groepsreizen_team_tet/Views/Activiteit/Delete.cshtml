@@ -1,0 +1,32 @@
+﻿@model Groepsreizen_team_tet.ViewModels.ActiviteitViewModels.ActiviteitDeleteViewModel
+
+<h3>Verwijder een activiteit</h3>
+
+<div>
+    <h4>Activiteit</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Naam)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Naam)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Beschrijving)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Beschrijving)
+        </dd>
+        <!-- Voeg hier eventueel meer velden toe die je wilt tonen -->
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger mt-3 me-2">Verwijderen</button>
+            <a asp-action="Beheer" class="btn btn-secondary mt-3">Annuleren</a>
+        </div>
+    </form>
+</div>

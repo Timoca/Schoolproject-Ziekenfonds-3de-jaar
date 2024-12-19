@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Account Verwijderen";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-danger">
+    <strong>Let op!</strong> Door je account te verwijderen, worden al je gegevens permanent verwijderd.
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger">Account Verwijderen</button>
+        <a asp-action="Index" class="btn btn-darkblue">Annuleren</a>
+    </div>
+</form>

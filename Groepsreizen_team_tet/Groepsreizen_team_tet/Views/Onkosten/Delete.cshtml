@@ -1,0 +1,54 @@
+﻿@model OnkostenDetailViewModel
+@{
+    ViewBag.Title = "Onkost verwijderen: " + @Model.Titel;
+}
+
+<h2>Onkost verwijderen: @Model.Titel</h2>
+
+<p>Weet je zeker dat je de onkost "@Model.Titel" wilt verwijderen?</p>
+<div>
+    <h5>Details onkost</h5>
+    <hr/>
+    <table class="table table-bordered mt-3">
+        <tbody>
+            <tr>
+                <th>Titel</th>
+                <td>@Model.Titel</td>
+            </tr>
+            <tr>
+                <th>Bedrag</th>
+                <td>@Model.Bedrag.ToString("C")</td>
+            </tr>
+            <tr>
+                <th>Datum</th>
+                <td>@Model.Datum.ToString("dd-MM-yyyy")</td>
+            </tr>
+            @if (Model.Locatie != null)
+            {
+                <tr>
+                    <th>Locatie</th>
+                    <td>@Model.Locatie</td>
+                </tr>
+            }
+            @if (Model.Betaalbewijs != null)
+            {
+                <tr>
+                    <th>Betaalbewijs</th>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="data:image/png;base64,@Convert.ToBase64String(Model.Betaalbewijs)" alt="Betaalbewijs" style="width:200px; height:auto;" />
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Verwijderen</button>
+    <a asp-action="Beheer" asp-controller="Onkosten" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-secondary">Annuleren</a>
+</form>

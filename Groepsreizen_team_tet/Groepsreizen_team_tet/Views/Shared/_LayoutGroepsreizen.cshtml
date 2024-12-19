@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Identity
+@using Groepsreizen_team_tet.Data
+@inject UserManager<CustomUser> UserManager
+@inject SignInManager<CustomUser> SignInManager
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Groepsreizen_team_tet</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Groepsreizen.css" />
+    <link rel="stylesheet" href="~/Groepsreizen_team_tet.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="wrapper">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                @* Logo *@
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" height="60" width="60" alt="Logo Groepsreizen">
+                    Groepsreizen
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                @* Links *@
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                        }
+                    </ul>
+
+                    @* Inlog-/Uitlogknop en Welkomstbericht*@
+                    <ul class="navbar-nav d-flex align-items-center">
+                        @if (User.Identity!.IsAuthenticated)
+                        {
+                            var user = await UserManager.GetUserAsync(User);
+                            string welcomeMessage = user != null ? $"Welkom {user.Voornaam} {user.Naam}" : "";
+
+                            <li class="nav-item">
+                                <span class="navbar-text me-5 text-white fw-bolder">@welcomeMessage</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-action="Logout" asp-controller="Account" method="post" id="logoutForm" class="form-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-login text-white">
+                                        Uitloggen
+                                        <i class="fas fa-sign-out-alt fa-lg me-2"></i>
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-login text-white" asp-controller="Account" asp-action="Login">
+                                    Inloggen
+                                    <i class="fas fa-user-circle fa-lg me-2"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+        @if (ViewBag.Breadcrumbs != null)
+        {
+            <div class="container mt-3">
+                <partial name="_Breadcrumb" model="ViewBag.Breadcrumbs as List<Groepsreizen_team_tet.Models.BreadcrumbItem>" />
+            </div>
+        }
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Groepsreizen Team T-E-T - <a asp-area="" asp-controller="Home" asp-action="Home">Home</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

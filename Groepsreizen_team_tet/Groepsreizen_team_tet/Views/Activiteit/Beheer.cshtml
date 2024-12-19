@@ -1,0 +1,38 @@
+﻿@model Groepsreizen_team_tet.ViewModels.ActiviteitViewModels.ActiviteitBeheerViewModel
+
+<h1>Activiteitenbeheer</h1>
+
+<!-- Knop om een nieuwe activiteit toe te voegen -->
+<a asp-action="Create" class="btn btn-success mb-3">Nieuwe activiteit aanmaken</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Beschrijving</th>
+            <th>Acties</th> <!-- Kolom voor de bewerkingsacties -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var activiteit in Model.Activiteiten)
+        {
+            <tr>
+                <td>@activiteit.Naam</td>
+                <td>@activiteit.Beschrijving</td>
+                <td>
+                    <!-- Knoppen voor acties: Wijzigen en Verwijderen -->
+                    <a asp-action="Edit" asp-route-id="@activiteit.Id" class="btn btn-warning btn-sm" title="Activiteit bewerken">
+                        <i class="fa fa-pencil-alt"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@activiteit.Id" class="btn btn-danger btn-sm" title="Activiteit verwijderen">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="BackToDashboard" class="btn btn-secondary">Terug naar dashboard</a>
+</div>

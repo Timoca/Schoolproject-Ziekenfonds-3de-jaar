@@ -1,0 +1,59 @@
+﻿@model OnkostenCreateViewModel
+@{
+    ViewBag.Title = "Onkost invoeren";
+}
+
+<h2>Onkosten invoeren</h2>
+
+<form asp-action="Create" asp-route-groepsreisId="@Model.GroepsreisId" enctype="multipart/form-data">
+    <input type="hidden" asp-for="GroepsreisId" />
+
+    <div class="mb-3">
+        <label asp-for="Datum" class="form-label">Datum</label>
+        <input asp-for="Datum" class="form-control" />
+        <span asp-validation-for="Datum" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Titel" class="form-label">Titel</label>
+        <input asp-for="Titel" class="form-control" />
+        <span asp-validation-for="Titel" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Omschrijving" class="form-label">Omschrijving</label>
+        <textarea asp-for="Omschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Omschrijving" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Bedrag" class="form-label">Bedrag</label>
+        <input asp-for="Bedrag" class="form-control" />
+        <span asp-validation-for="Bedrag" class="text-danger"></span>
+    </div>
+
+    @if (User.IsInRole("Hoofdmonitor"))
+    {
+        <div class="mb-3">
+            <label asp-for="Locatie" class="form-label">Locatie</label>
+            <input asp-for="Locatie" class="form-control" />
+            <span asp-validation-for="Locatie" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Betaalbewijs" class="form-label">Betaalbewijs</label>
+            <input asp-for="Betaalbewijs" type="file" class="form-control" />
+            <span asp-validation-for="Betaalbewijs" class="text-danger"></span>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-darkblue">Opslaan</button>
+    @if (User.IsInRole("Hoofdmonitor"))
+    {
+        <a asp-action="Index" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-secondary">Annuleren</a>
+    }
+    else if (User.IsInRole("Verantwoordelijke"))
+    {
+        <a asp-action="Beheer" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-secondary">Annuleren</a>
+    }
+</form>

@@ -1,0 +1,47 @@
+﻿@model Groepsreizen_team_tet.ViewModels.ActiviteitViewModels.ActiviteitViewModel
+
+<h1>Activiteitenlijst</h1>
+
+<!-- Naar de beheerpagina -->
+<a asp-action="Beheer" class="btn btn-primary mb-3">Beheer activiteiten</a>
+
+<!-- Overzicht van alle activiteiten en de activiteit per groepsreis -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Beschrijving</th>
+            <th>Activiteit geregistreerd in groepsreis</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var activiteit in Model.Activiteiten)
+        {
+            <tr>
+                <td>@activiteit.Naam</td>
+                <td>@activiteit.Beschrijving</td>
+                <td>
+                    @if (activiteit.Groepsreizen.Any())
+                    {
+                        <ul>
+                            @foreach (var groepsreis in activiteit.Groepsreizen)
+                            {
+                                <li>@groepsreis.Code - @groepsreis.BestemmingNaam (@groepsreis.Begindatum.ToString("dd MMM yyyy") - @groepsreis.Einddatum?.ToString("dd MMM yyyy"))
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>Geen groepsreizen</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Terug knop-->
+<div class="text-start mt-5">
+    <button class="btn btn-outline-secondary" type="button" onclick="history.back()">Ga terug</button>
+</div>

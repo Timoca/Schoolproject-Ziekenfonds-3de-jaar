@@ -1,0 +1,456 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GezinsledenViewModels.GezinsledenManageViewModel
+
+
+<h2>Beheer gezinsleden</h2>
+
+<div class="container mt-5">
+    <!-- Button to open Add Gezinslid Modal -->
+    <button type="button" class="btn btn-success mb-4" data-bs-toggle="modal" data-bs-target="#addGezinslidModal">
+        Voeg een kind toe
+    </button>
+
+    <!-- Validation Summary -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-info">
+            @Html.ValidationSummary(true, "")
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Naam Kind</th>
+                <th>Geboortedatum</th>
+                <th>Allergieen</th>
+                <th>Medicatie</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var gezinslid in Model.Gezinsleden)
+            {
+                <tr>
+                    <td>@gezinslid.Voornaam @gezinslid.Naam</td>
+                    <td>@gezinslid.Geboortedatum.ToString("dd/MM/yyyy")</td>
+                    <td>@string.Join(", ", gezinslid.AllergieenList)</td>
+                    <td>@string.Join(", ", gezinslid.MedicatieList)</td>
+
+                    <td class="text-nowrap">
+                        <!-- Wijzig Knop -->
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editGezinslidModal"
+                                data-id="@gezinslid.Id"
+                                data-voornaam="@gezinslid.Voornaam"
+                                data-naam="@gezinslid.Naam"
+                                data-geboortedatum="@gezinslid.Geboortedatum.ToString("yyyy-MM-dd")"
+                                data-allergieen="@string.Join(", ", gezinslid.AllergieenList)"
+                                data-medicatie="@string.Join(", ", gezinslid.MedicatieList)">
+                            <i class="fa fa-pencil-alt"></i>
+                        </button>
+
+                        <!-- Verwijder Knop -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteGezinslidModal"
+                                data-id="@gezinslid.Id"
+                                data-voornaam="@gezinslid.Voornaam"
+                                data-naam="@gezinslid.Naam">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Add Gezinslid Modal -->
+    <div class="modal fade" id="addGezinslidModal" tabindex="-1" aria-labelledby="addGezinslidModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addGezinslidModalLabel">Kind Toevoegen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Voornaam -->
+                        <div class="mb-3">
+                            <label asp-for="NewGezinslid.Voornaam" class="form-label">Voornaam</label>
+                            <input asp-for="NewGezinslid.Voornaam" class="form-control" />
+                            <span asp-validation-for="NewGezinslid.Voornaam" class="text-danger"></span>
+                        </div>
+                        <!-- Naam -->
+                        <div class="mb-3">
+                            <label asp-for="NewGezinslid.Naam" class="form-label">Naam</label>
+                            <input asp-for="NewGezinslid.Naam" class="form-control" />
+                            <span asp-validation-for="NewGezinslid.Naam" class="text-danger"></span>
+                        </div>
+                        <!-- Geboortedatum -->
+                        <div class="mb-3">
+                            <label asp-for="NewGezinslid.Geboortedatum" class="form-label">Geboortedatum</label>
+                            <input asp-for="NewGezinslid.Geboortedatum" class="form-control" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@DateTime.Today.AddYears(-1 * 18).ToString("yyyy-MM-dd")" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="NewGezinslid.Geboortedatum" class="text-danger"></span>
+                        </div>
+                        <!-- Allergieën -->
+                        <div class="mb-3">
+                            <label class="form-label">Allergieën</label>
+                            <div id="allergieenList">
+                                <!-- Dynamically add allergieën -->
+                            </div>
+                            <button type="button" class="btn btn-darkblue mt-2" id="addAllergieBtn">Allergie Toevoegen</button>
+                        </div>
+                        <!-- Medicatie -->
+                        <div class="mb-3">
+                            <label class="form-label">Medicatie</label>
+                            <div id="medicatieList">
+                                <!-- Dynamically add medicatie -->
+                            </div>
+                            <button type="button" class="btn btn-darkblue mt-2" id="addMedicatieBtn">Medicatie Toevoegen</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-darkblue">Toevoegen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Gezinslid Modal -->
+    <div class="modal fade" id="editGezinslidModal" tabindex="-1" aria-labelledby="editGezinslidModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editGezinslidModalLabel">Kind Wijzigen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @* Hidden field for Id *@
+                        <input type="hidden" id="editId" name="Id" />
+
+                        <!-- Voornaam -->
+                        <div class="mb-3">
+                            <label class="form-label">Voornaam</label>
+                            <input type="text" class="form-control" id="editVoornaam" name="Voornaam" required />
+                            <span class="text-danger" data-valmsg-for="Voornaam" data-valmsg-replace="true"></span>
+                        </div>
+                        <!-- Naam -->
+                        <div class="mb-3">
+                            <label class="form-label">Naam</label>
+                            <input type="text" class="form-control" id="editNaam" name="Naam" required />
+                            <span class="text-danger" data-valmsg-for="Naam" data-valmsg-replace="true"></span>
+                        </div>
+                        <!-- Geboortedatum -->
+                        <div class="mb-3">
+                            <label class="form-label">Geboortedatum</label>
+                            <input type="date" class="form-control" id="editGeboortedatum" name="Geboortedatum" min="@DateTime.Today.AddYears(-1 * 18).ToString("yyyy-MM-dd")" max="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                            <span class="text-danger" data-valmsg-for="Geboortedatum" data-valmsg-replace="true"></span>
+                        </div>
+                        <!-- Allergieën -->
+                        <div class="mb-3">
+                            <label class="form-label">Allergieën</label>
+                            <div id="editAllergieenList">
+                                <!-- Dynamically add allergieën -->
+                            </div>
+                            <button type="button" class="btn btn-darkblue mt-2" id="editAddAllergieBtn">Allergie Toevoegen</button>
+                        </div>
+                        <!-- Medicatie -->
+                        <div class="mb-3">
+                            <label class="form-label">Medicatie</label>
+                            <div id="editMedicatieList">
+                                <!-- Dynamically add medicatie -->
+                            </div>
+                            <button type="button" class="btn btn-darkblue mt-2" id="editAddMedicatieBtn">Medicatie Toevoegen</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-darkblue">Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Gezinslid Modal -->
+    <div class="modal fade" id="deleteGezinslidModal" tabindex="-1" aria-labelledby="deleteGezinslidModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteGezinslidModalLabel">Gezinslid Verwijderen</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @* Hidden field for Id *@
+                        <input type="hidden" id="deleteId" name="Id" />
+                        <p>Weet je zeker dat je <strong id="deleteGezinslidName"></strong> wilt verwijderen?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                        <button type="submit" class="btn btn-danger">Verwijderen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Button to open Add Gezinslid Modal -->
+    <a asp-action="GoToDashboard" class="btn btn-secondary mt-3">Vorige</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // --------------------------
+        // Add Gezinslid Modal Scripts
+        // --------------------------
+
+        // Teller voor Allergieën en Medicatie
+        let allergieTeller = 0;
+        let medicatieTeller = 0;
+
+        // Allergieën Toevoegen in Add Modal
+        document.getElementById('addAllergieBtn').addEventListener('click', function () {
+            var list = document.getElementById('allergieenList');
+            var div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                                <input type="text" name="NewGezinslid.AllergieenList" class="form-control" placeholder="Allergie" required />
+                                <button type="button" class="btn btn-danger removeAllergieBtn">Verwijder</button>
+                            `;
+            list.appendChild(div);
+
+            // Incrementer de teller
+            allergieTeller++;
+
+            // Als meer dan één allergie is toegevoegd, wijzig de knoptekst
+            if (allergieTeller === 1) {
+                this.textContent = 'Andere Allergie Toevoegen';
+            }
+        });
+
+        // Allergieën Verwijderen in Add Modal
+        document.getElementById('allergieenList').addEventListener('click', function (e) {
+            if (e.target && e.target.matches('button.removeAllergieBtn')) {
+                e.target.parentElement.remove();
+
+                // Decrementer de teller
+                allergieTeller--;
+
+                // Als er geen extra allergieën zijn, zet de knoptekst terug
+                if (allergieTeller === 0) {
+                    document.getElementById('addAllergieBtn').textContent = 'Allergie Toevoegen';
+                }
+            }
+        });
+
+        // Medicatie Toevoegen in Add Modal
+        document.getElementById('addMedicatieBtn').addEventListener('click', function () {
+            var list = document.getElementById('medicatieList');
+            var div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                                <input type="text" name="NewGezinslid.MedicatieList" class="form-control" placeholder="Medicatie" required />
+                                <button type="button" class="btn btn-danger removeMedicatieBtn">Verwijder</button>
+                            `;
+            list.appendChild(div);
+
+            // Incrementer de teller
+            medicatieTeller++;
+
+            // Als meer dan één medicatie is toegevoegd, wijzig de knoptekst
+            if (medicatieTeller === 1) {
+                this.textContent = 'Andere Medicatie Toevoegen';
+            }
+        });
+
+        // Medicatie Verwijderen in Add Modal
+        document.getElementById('medicatieList').addEventListener('click', function (e) {
+            if (e.target && e.target.matches('button.removeMedicatieBtn')) {
+                e.target.parentElement.remove();
+
+                // Decrementer de teller
+                medicatieTeller--;
+
+                // Als er geen extra medicatie is, zet de knoptekst terug
+                if (medicatieTeller === 0) {
+                    document.getElementById('addMedicatieBtn').textContent = 'Medicatie Toevoegen';
+                }
+            }
+        });
+
+        // ---------------------------
+        // Edit Gezinslid Modal Scripts
+        // ---------------------------
+
+        // Teller voor Allergieën en Medicatie in Edit Modal
+        let editAllergieTeller = 0;
+        let editMedicatieTeller = 0;
+
+        var editGezinslidModal = document.getElementById('editGezinslidModal');
+        editGezinslidModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var voornaam = button.getAttribute('data-voornaam');
+            var naam = button.getAttribute('data-naam');
+            var geboortedatum = button.getAttribute('data-geboortedatum');
+            var allergieen = button.getAttribute('data-allergieen');
+            var medicatie = button.getAttribute('data-medicatie');
+
+            var modal = this;
+            var form = modal.querySelector('form');
+            form.action = '/Gezinslid/Edit/' + id;
+
+            // Populate fields
+            modal.querySelector('#editId').value = id;
+            modal.querySelector('#editVoornaam').value = voornaam;
+            modal.querySelector('#editNaam').value = naam;
+            modal.querySelector('#editGeboortedatum').value = geboortedatum;
+
+            // Clear existing lists
+            var allergieenList = modal.querySelector('#editAllergieenList');
+            allergieenList.innerHTML = '';
+            var medicatieList = modal.querySelector('#editMedicatieList');
+            medicatieList.innerHTML = '';
+
+            // Reset tellers
+            editAllergieTeller = 0;
+            editMedicatieTeller = 0;
+
+            // Populate Allergieën
+            if (allergieen) {
+                var allergieenArray = allergieen.split(',');
+                allergieenArray.forEach(function (item) {
+                    if (item.trim() !== "") {
+                        var div = document.createElement('div');
+                        div.className = 'input-group mb-2';
+                        div.innerHTML = `
+                                            <input type="text" name="AllergieenList" class="form-control" value="${item.trim()}" required />
+                                            <button type="button" class="btn btn-danger removeAllergieBtn">Verwijder</button>
+                                        `;
+                        allergieenList.appendChild(div);
+                        editAllergieTeller++;
+                    }
+                });
+                // Als er minstens één allergie is, wijzig de knoptekst
+                if (editAllergieTeller > 0) {
+                    modal.querySelector('#editAddAllergieBtn').textContent = 'Andere Allergie Toevoegen';
+                }
+            }
+
+            // Populate Medicatie
+            if (medicatie) {
+                var medicatieArray = medicatie.split(',');
+                medicatieArray.forEach(function (item) {
+                    if (item.trim() !== "") {
+                        var div = document.createElement('div');
+                        div.className = 'input-group mb-2';
+                        div.innerHTML = `
+                                            <input type="text" name="MedicatieList" class="form-control" value="${item.trim()}" required />
+                                            <button type="button" class="btn btn-danger removeMedicatieBtn">Verwijder</button>
+                                        `;
+                        medicatieList.appendChild(div);
+                        editMedicatieTeller++;
+                    }
+                });
+                // Als er minstens één medicatie is, wijzig de knoptekst
+                if (editMedicatieTeller > 0) {
+                    modal.querySelector('#editAddMedicatieBtn').textContent = 'Andere Medicatie Toevoegen';
+                }
+            }
+        });
+
+        // Allergieën Toevoegen in Edit Modal
+        document.getElementById('editAddAllergieBtn').addEventListener('click', function () {
+            var list = document.getElementById('editAllergieenList');
+            var div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                                <input type="text" name="AllergieenList" class="form-control" placeholder="Allergie" required />
+                                <button type="button" class="btn btn-danger removeAllergieBtn">Verwijder</button>
+                            `;
+            list.appendChild(div);
+
+            // Incrementer de teller
+            editAllergieTeller++;
+
+            // Als meer dan één allergie is toegevoegd, wijzig de knoptekst
+            if (editAllergieTeller === 1) {
+                this.textContent = 'Andere Allergie Toevoegen';
+            }
+        });
+
+        // Allergieën Verwijderen in Edit Modal
+        document.getElementById('editAllergieenList').addEventListener('click', function (e) {
+            if (e.target && e.target.matches('button.removeAllergieBtn')) {
+                e.target.parentElement.remove();
+
+                // Decrementer de teller
+                editAllergieTeller--;
+
+                // Als er geen extra allergieën zijn, zet de knoptekst terug
+                if (editAllergieTeller === 0) {
+                    document.getElementById('editAddAllergieBtn').textContent = 'Allergie Toevoegen';
+                }
+            }
+        });
+
+        // Medicatie Toevoegen in Edit Modal
+        document.getElementById('editAddMedicatieBtn').addEventListener('click', function () {
+            var list = document.getElementById('editMedicatieList');
+            var div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                                <input type="text" name="MedicatieList" class="form-control" placeholder="Medicatie" required />
+                                <button type="button" class="btn btn-danger removeMedicatieBtn">Verwijder</button>
+                            `;
+            list.appendChild(div);
+
+            // Incrementer de teller
+            editMedicatieTeller++;
+
+            // Als meer dan één medicatie is toegevoegd, wijzig de knoptekst
+            if (editMedicatieTeller === 1) {
+                this.textContent = 'Andere Medicatie Toevoegen';
+            }
+        });
+
+        // Medicatie Verwijderen in Edit Modal
+        document.getElementById('editMedicatieList').addEventListener('click', function (e) {
+            if (e.target && e.target.matches('button.removeMedicatieBtn')) {
+                e.target.parentElement.remove();
+
+                // Decrementer de teller
+                editMedicatieTeller--;
+
+                // Als er geen extra medicatie is, zet de knoptekst terug
+                if (editMedicatieTeller === 0) {
+                    document.getElementById('editAddMedicatieBtn').textContent = 'Medicatie Toevoegen';
+                }
+            }
+        });
+
+        // -----------------------------
+        // Delete Gezinslid Modal Scripts
+        // -----------------------------
+
+        var deleteGezinslidModal = document.getElementById('deleteGezinslidModal');
+        deleteGezinslidModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var voornaam = button.getAttribute('data-voornaam');
+            var naam = button.getAttribute('data-naam');
+
+            var modal = this;
+            modal.querySelector('#deleteId').value = id;
+            modal.querySelector('#deleteGezinslidName').textContent = voornaam + ' ' + naam;
+        });
+    </script>
+}

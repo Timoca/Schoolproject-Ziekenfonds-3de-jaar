@@ -1,0 +1,13 @@
+﻿@model Opleiding
+
+@{
+    ViewBag.Title = "Inschrijvingsbevestiging";
+}
+
+<h2>Je bent succesvol ingeschreven voor @Model.Naam</h2>
+
+<p>Locatie: @Model.Locatie</p>
+<p>Begindatum: @Model.Begindatum.ToString("dd-MM-yyyy")</p>
+<p>Einddatum: @Model.Einddatum.ToString("dd-MM-yyyy")</p>
+
+<a asp-action="Index" class="btn btn-primary">Terug naar Opleidingen</a>

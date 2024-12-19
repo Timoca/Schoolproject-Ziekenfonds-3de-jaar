@@ -1,0 +1,121 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisDeelnemersViewModel
+
+<div class="container mt-4">
+    @if (!Model.IsGeannuleerd)
+    {
+        <!-- Hoofdkaart voor het formulier -->
+    <div class="card">
+        <div class="card-header text-white">
+            <h2><i class="fas fa-users"></i> Deelnemers beheren voor @Model.BestemmingNaam</h2>
+        </div>
+        <div class="card-body">
+            <!-- Filter formulier -->
+            <form asp-action="BeheerDeelnemers" method="get">
+                <input type="hidden" asp-for="GroepsreisId" />
+                <div class="mb-3">
+                    <label for="OuderNaamFilter" class="form-label">Filter op naam van ouder of voogd:</label>
+                    <div class="input-group">
+                        <input type="text" name="ouderNaamFilter" value="@Model.OuderNaamFilter" class="form-control"
+                               placeholder="Geef de naam in..." />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filteren
+                        </button>
+                        <a asp-action="BeheerDeelnemers" asp-route-id="@Model.GroepsreisId" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Reset filter
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Selecteerbare kinderen sectie tonen als er kinderen zijn na het filter -->
+            @if (Model.AlleKinderen.Any())
+            {
+                <form asp-action="BeheerDeelnemers" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="GroepsreisId" />
+                    <input type="hidden" asp-for="OuderNaamFilter" />
+
+                    <div class="form-group">
+                        <label for="GeselecteerdeKinderenIds">Selecteer Deelnemers:</label>
+                        <select asp-for="GeselecteerdeKinderenIds" asp-items="Model.AlleKinderen" multiple class="form-control" style="height: 300px;">
+                        </select>
+                        <small class="text-end d-block">Tip: houdt CTRL ingedrukt om meerdere activiteiten te selecteren.</small>
+                    </div>
+                    <button type="submit" class="btn btn-success mt-3">
+                        <i class="fas fa-save"></i> Opslaan
+                    </button>
+                    <a asp-action="Beheer" class="btn btn-secondary mt-3">
+                        <i class="fas fa-times"></i> Annuleren
+                    </a>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-info mt-3 bg-light" role="alert">
+                    Filter op achternaam van de ouder of voogd om de kinderen te tonen.
+                </div>
+            }
+        </div>
+    </div>
+    }
+    else
+    {
+    <div class="alert alert-warning">
+        <strong>Deze groepsreis is geannuleerd.</strong> Er kunnen geen nieuwe monitoren meer worden toegevoegd.
+    </div>
+    }
+
+    <!-- Kaart voor de huidige deelnemers -->
+    @if (Model.HuidigeDeelnemers.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header text-white">
+                <h3><i class="fas fa-list"></i> Huidige Deelnemers</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @foreach (var deelnemer in Model.HuidigeDeelnemers)
+                    {
+                        <li class="list-group-item">
+                            <strong>@deelnemer.KindNaam</strong>
+                            <p class="mb-0"><em>Opmerkingen:</em> @deelnemer.Opmerkingen</p>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+
+    <!-- Kaart voor de wachtlijst deelnemers -->
+    @if (Model.WachtlijstDeelnemers.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header text-white">
+                <h3><i class="fas fa-hourglass-half"></i> Wachtlijst Deelnemers</h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    @foreach (var wachtlijst in Model.WachtlijstDeelnemers)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>@wachtlijst.KindNaam</strong>
+                                <p class="mb-0"><em>Opmerkingen:</em> @wachtlijst.Opmerkingen</p>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            @if ((User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder")) && Model.WachtlijstDeelnemers.Count >= Model.Deelnemerslimiet)
+            {
+                <form asp-action="AddExtraGroepsreis" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="groepsreisId" value="@Model.GroepsreisId" />
+                    <button type="submit" class="btn btn-darkblue m-3">
+                        Maak een extra groepsreis aan
+                    </button>
+                </form>
+            }
+        </div>
+    }
+</div>

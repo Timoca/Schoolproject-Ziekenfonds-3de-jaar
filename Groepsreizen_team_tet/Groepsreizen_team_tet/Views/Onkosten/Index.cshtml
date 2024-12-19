@@ -1,0 +1,107 @@
+@model OnkostenIndexViewModel
+@{
+    ViewBag.Title = "Onkostenoverzicht " + Model.GroepsreisNaam;
+}
+
+<h2>Onkosten voor Groepsreis: @Model.GroepsreisNaam</h2>
+
+<div class="row">
+    <!-- Card 1: Totaalbudget -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Totaalbudget</h5>
+                <p class="card-text" style="font-size: 1.5rem; font-weight: bold;">
+                    @Model.BudgetHoofdmonitor.ToString("C")
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Verbruikt budget -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Verbruikt budget</h5>
+                <p class="card-text" style="font-size: 1.5rem; font-weight: bold;">
+                    @Model.TotaalOnkosten.ToString("C")
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Resterend budget -->
+    <div class="col-md-4">
+@*         <div class="card shadow-sm @(Model.ResterendBudget < 0 ? "border-danger" : "")">
+ *@        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Resterend budget</h5>
+                <p class="card-text @(Model.ResterendBudget < 0 ? "text-danger" : "")" style="font-size: 1.5rem; font-weight: bold;">
+                    @Model.ResterendBudget.ToString("C")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (Model.BudgetHoofdmonitor > 0)
+{
+    <div class="progress" style="height: 30px;">
+        <div class="progress-bar bg-success" role="progressbar"
+             style="width: @(Math.Min(100, (Model.TotaalOnkosten / Model.BudgetHoofdmonitor) * 100).ToString(System.Globalization.CultureInfo.InvariantCulture))%;" @* punt of komma voor kommagetallen *@
+             aria-valuenow="@Model.TotaalOnkosten"
+             aria-valuemin="0"
+             aria-valuemax="@Model.BudgetHoofdmonitor">
+            @(Math.Round((Model.TotaalOnkosten / Model.BudgetHoofdmonitor) * 100, 0))% Opgebruikt
+        </div>
+    </div>
+
+}
+else
+{
+    <p class="text-danger">Geen budget beschikbaar voor deze groepsreis.</p>
+}
+
+<div class="mb-3 mt-3 text-end">
+    <a asp-action="Create" asp-controller="Onkosten" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-success">
+        Onkost invoeren
+    </a>
+</div>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Titel</th>
+            <th>Omschrijving</th>
+            <th>Bedrag</th>
+            <th>Locatie</th>
+            <th>Betaalbewijs</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var onkost in Model.OnkostenLijst)
+        {
+            <tr>
+                <td>@onkost.Datum.ToString("dd-MM-yyyy")</td>
+                <td>@onkost.Titel</td>
+                <td>@onkost.Omschrijving</td>
+                <td>@onkost.Bedrag.ToString("C")</td>
+                <td>@onkost.Locatie</td>
+                <td>
+                    @if (onkost.Betaalbewijs != null)
+                    {
+                        <img src="data:image/png;base64,@Convert.ToBase64String(onkost.Betaalbewijs)" alt="Betaalbewijs van uitgave" style="width:100px; height:auto;" />
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Knop om terug te keren naar de groepsreis -->
+<div class="mt-4">
+    <a asp-action="Detail" asp-controller="Groepsreis" asp-route-id="@Model.GroepsreisId" class="btn btn-outline-secondary">Terug naar groepsreis</a>
+</div>

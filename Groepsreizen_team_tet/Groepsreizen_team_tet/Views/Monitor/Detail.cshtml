@@ -1,0 +1,138 @@
+﻿@model Groepsreizen_team_tet.ViewModels.MonitorViewModels.MonitorDetailsViewModel
+@{
+    ViewData["Title"] = "Monitor Details";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- Persoonlijke Gegevens -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Persoonlijke Gegevens
+        </div>
+        <div class="card-body">
+            <p><strong>Naam:</strong> @Model.Naam @Model.Voornaam</p>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Straat:</strong> @Model.Straat @Model.Huisnummer</p>
+            <p><strong>Gemeente:</strong> @Model.Gemeente</p>
+            <p><strong>Postcode:</strong> @Model.Postcode</p>
+            <p><strong>Geboortedatum:</strong> @Model.Geboortedatum.ToShortDateString()</p>
+            <p><strong>Telefoonnummer:</strong> @Model.Telefoonnummer</p>
+            <p><strong>Huisdokter:</strong> @Model.Huisdokter</p>
+            <p><strong>Contractnummer:</strong> @Model.ContractNummer</p>
+            <p><strong>Rekeningnummer:</strong> @Model.RekeningNummer</p>
+            <p><strong>Actief:</strong> @(Model.IsActief ? "Ja" : "Nee")</p>
+        </div>
+    </div>
+
+    <!-- Rolgegevens -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Rolgegevens
+        </div>
+        <div class="card-body">
+            <p><strong>Hoofdmonitor:</strong> @(Model.IsHoofdMonitor ? "Ja" : "Nee")</p>
+
+            @if (!Model.IsHoofdMonitor)
+            {
+                <form asp-action="SetHoofdMonitor" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-darkblue">Instellen als Hoofdmonitor</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    <!-- Opleidingen -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Opleidingen
+        </div>
+        <div class="card-body">
+            @if (Model.Opleidingen.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Beschrijving</th>
+                            <th>Begindatum</th>
+                            <th>Einddatum</th>
+                            <th>Locatie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var opleiding in Model.Opleidingen)
+                        {
+                            <tr>
+                                <td>@opleiding.Naam</td>
+                                <td>@opleiding.Beschrijving</td>
+                                <td>@opleiding.Begindatum.ToShortDateString()</td>
+                                <td>@opleiding.Einddatum.ToShortDateString()</td>
+                                <td>@opleiding.Locatie</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Deze monitor heeft nog geen opleidingen gevolgd.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Groepsreizen -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Groepsreizen
+        </div>
+        <div class="card-body">
+            @if (Model.Groepsreizen.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Begindatum</th>
+                            <th>Einddatum</th>
+                            <th>Hoofdmonitor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var reis in Model.Groepsreizen)
+                        {
+                            <tr>
+                                <td>@reis.Naam</td>
+                                <td>@reis.Datum.ToShortDateString()</td>
+                                <td>@reis.Datum.ToShortDateString()</td>
+                                <td>@(reis.WasHoofdMonitor ? "Ja" : "Nee")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Deze monitor heeft nog geen groepsreizen gedaan.</p>
+            }
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary">Terug naar Overzicht</a>
+</div>

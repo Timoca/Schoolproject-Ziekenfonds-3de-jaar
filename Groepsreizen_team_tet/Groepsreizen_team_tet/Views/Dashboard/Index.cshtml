@@ -1,0 +1,295 @@
+@model DashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<h2>Dashboard</h2>
+
+
+
+@if (User.IsInRole("Monitor"))
+{
+    @if (Model.MeldingenDoorVerantwoordelijke != null && Model.MeldingenDoorVerantwoordelijke.Any())
+    {
+        <div class="alert alert-info" role="alert">
+            @foreach (var melding in Model.MeldingenDoorVerantwoordelijke)
+            {
+                <p>@melding</p>
+            }
+        </div>
+    }
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Opleidingen waarvoor je bent ingeschreven</h5>
+                <h6>Bekijk hier alle opleidingen waarvoor je bent ingeschreven</h6>
+
+                @if (Model.IngeschrevenOpleidingen.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var opleiding in Model.IngeschrevenOpleidingen)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @opleiding.Naam (@opleiding.Begindatum.ToString("dd-MM-yyyy"))
+                                <a asp-controller="Opleiding" asp-action="DetailMonitor" asp-route-id="@opleiding.Id" class="btn btn-darkblue btn-sm text-white">Details</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Je hebt geen opleidingen op de planning staan.</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if(User.IsInRole("Deelnemer")){
+    <!-- Review sectie -->
+    @if (Model.ReviewGroepsreizen != null && Model.ReviewGroepsreizen.Count > 0)
+    {
+        foreach (var groepsreis in Model.ReviewGroepsreizen)
+        {
+            <div class="alert alert-info">
+                <strong>Groepsreis @groepsreis.Naam</strong> is afgelopen.
+                <a href="@Url.Action("Create", "Review", new { groepsreisId = groepsreis.GroepsreisId })" class="btn btn-darkblue btn-sm ms-3">Geef een Review</a>
+            </div>
+        }
+    }
+}
+
+
+<div class="container mt-5">
+    @* De gebruiker is een deelnemer *@
+    <div class="row">
+        @if (User.IsInRole("Gebruiker")|| User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+        { 
+        @* Overzicht groepsreizen *@
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Aanbod groepsreizen</h5>
+                    <h6>Bekijk hier alle aankomende groepsreizen</h6>
+                       
+                        <a asp-controller="Groepsreis" asp-action="Index" class="btn btn-darkblue mt-3">Ga naar de groepsreizen</a>
+                    
+                </div>
+            </div>
+        </div>
+
+        @* Overzicht ingeschreven groepsreizen *@
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Reisgeschiedenis</h5>
+                    <h6>Bekijk hier alle groepsreizen die je hebt meegedaan</h6>
+                        
+                        <a asp-controller="Groepsreis" asp-action="IngeschrevenReizen" class="btn btn-darkblue mt-3">Ga naar jouw reisgeschiedenis</a>
+                </div>
+            </div>
+        </div>
+
+        @* Account *@
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Account</h5>
+                    <h6>Bekijk hier jouw accountgegevens</h6>
+                       
+                        <a asp-controller="Account" asp-action="Index" class="btn btn-darkblue mt-3">Ga naar jouw account</a>
+                </div>
+            </div>
+        </div>
+
+        @* Gezinsleden beheren *@
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Gezinsleden</h5>
+                    <h6>Bekijk hier alle informatie van jouw gezinsleden</h6>
+                        
+                        <a asp-controller="Gezinslid" asp-action="Gezinsleden" class="btn btn-darkblue mt-3">Ga naar jouw gezinsleden</a>
+                </div>
+            </div>
+        </div>
+         } 
+
+        @* De gebruiker is een monitor *@
+         @if (User.IsInRole("Monitor"))
+        { 
+        @* Overzicht van de opleidingen *@
+
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Opleidingsaanbod</h5>
+                    <h6>Bekijk hier alle opleidingen</h6>
+                        
+                        <a asp-controller="Opleiding" asp-action="Index" class="btn btn-darkblue mt-3">Ga naar het opleidingsoverzicht</a>
+                </div>
+            </div>
+        </div>
+
+
+         } 
+
+        @* De gebruiker is een verantwoordelijke of beheerder *@
+          @if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+        { 
+
+        @* Overzicht aankomende reizen *@
+
+        @* Groepsreizen beheren *@
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Groepsreizenbeheer</h5>
+                    <h6>Beheer hier alle groepsreizen</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a asp-controller="Groepsreis" asp-action="Create">
+                                Maak een nieuwe groepsreis aan
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a asp-controller="Groepsreis" asp-action="Beheer">
+                                Wijzig een groepsreis
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a asp-controller="Groepsreis" asp-action="Beheer">
+                                Verwijder een groepsreis
+                            </a>
+                        </li>
+                    </ul>
+                    <a asp-controller="Groepsreis" asp-action="Beheer" class="btn btn-darkblue mt-3">Ga naar het groepsreizenoverzicht</a>
+
+                </div>
+            </div>
+        </div>
+
+            @* Monitoren beheren *@
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 w-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Monitorenbeheer</h5>
+                        <h6>Beheer hier alle monitoren</h6>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a asp-controller="Monitor" asp-action="Create">
+                                    Maak een nieuwe monitor aan
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a asp-controller="Monitor" asp-action="Vorige">
+                                    Wijzig een monitor
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="mt-auto">
+                            <a asp-controller="Monitor" asp-action="Index" class="btn btn-darkblue mt-3">Ga naar het monitorenoverzicht</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        @* Opleidingen beheren *@
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Opleidingenbeheer</h5>
+                    <h6>Beheer hier alle opleidingen</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a asp-controller="Opleiding" asp-action="Create">
+                                Maak een nieuwe opleiding aan
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a asp-controller="Opleiding" asp-action="Beheer">
+                                Wijzig een opleiding
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a asp-controller="Opleiding" asp-action="Beheer">
+                                Verwijder een opleiding
+                            </a>
+                        </li>
+                    </ul>
+                    <a asp-controller="Opleiding" asp-action="Beheer" class="btn btn-darkblue mt-3">Ga naar het opleidingsoverzicht</a>
+
+                </div>
+            </div>
+        </div>
+
+        @* Activiteiten beheren *@
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Activiteitenbeheer</h5>
+                    <h6>Beheer hier alle activiteiten</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a asp-controller="Activiteit" asp-action="Create">
+                                Maak een nieuwe activiteit aan
+                            </a>
+                        <li class="list-group-item">
+                                <a asp-controller="Activiteit" asp-action="Beheer">
+                                Wijzig een activiteit
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                                <a asp-controller="Activiteit" asp-action="Beheer">
+                                Verwijder een activiteit
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="mt-auto">
+                        <a asp-controller="Activiteit" asp-action="Beheer" class="btn btn-darkblue mt-3">Ga naar het activiteitenoverzicht</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+         } 
+
+         @* De gebruiker is een beheerder *@
+          @if (User.IsInRole("Beheerder"))
+        {
+            @* Gebruikers beheren *@
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 w-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Gebruikersbeheer</h5>
+                        <h6>Beheer hier alle gebruikers</h6>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <a asp-controller="Gebruiker" asp-action="Beheer">
+                                    Wijzig een gebruiker
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <a asp-controller="Gebruiker" asp-action="Beheer">
+                                    Verwijder een gebruiker
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="mt-auto">
+                            <a asp-controller="Gebruiker" asp-action="Beheer" class="btn btn-darkblue mt-3">Ga naar het gebruikersoverzicht</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

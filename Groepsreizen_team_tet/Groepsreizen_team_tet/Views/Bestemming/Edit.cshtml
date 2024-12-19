@@ -1,0 +1,137 @@
+﻿@model Groepsreizen_team_tet.ViewModels.BestemmingViewModels.BestemmingEditViewModel
+
+<div class="container">
+    <h1 class="mb-4">Bewerk Bestemming</h1>
+    <div class="card shadow-sm p-4 mb-5 bg-white rounded">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <!-- Naam van de bestemming -->
+            <div class="mb-3">
+                <label asp-for="Naam" class="form-label">Naam</label>
+                <input asp-for="Naam" class="form-control" />
+                <span asp-validation-for="Naam" class="text-danger"></span>
+            </div>
+
+            <!-- Code van de bestemming -->
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label">Code</label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+
+            <!-- Beschrijving van de bestemming -->
+            <div class="mb-3">
+                <label asp-for="Beschrijving" class="form-label">Beschrijving</label>
+                <textarea asp-for="Beschrijving" class="form-control"></textarea>
+                <span asp-validation-for="Beschrijving" class="text-danger"></span>
+            </div>
+
+            <!-- Leeftijdscategorie -->
+            <div class="mb-3">
+                <label for="LeeftijdCategorie" id="categorieLabel" class="form-label d-none">Selecteer een leeftijdscategorie</label>
+                <label for="LeeftijdCategorie" class="form-label">Selecteer een leeftijdscategorie</label>
+                <select asp-for="LeeftijdCategorie" class="form-select" id="leeftijdCategorie" oninput="updateLeeftijdCategorie(this.value)">
+                    <option value="1">10-12 jaar</option>
+                    <option value="2">13-15 jaar</option>
+                    <option value="3">16-18 jaar</option>
+                </select>
+            </div>
+            <input type="hidden" asp-for="MinLeeftijd" id="MinLeeftijd" />
+            <input type="hidden" asp-for="MaxLeeftijd" id="MaxLeeftijd" />
+
+            <!-- Foto toevoegen of verwijderen -->
+            <div class="mb-3">
+                <label class="form-label">Bestaande foto's</label>
+                <div class="row" id="fotoContainer">
+                    @foreach (var foto in Model.BestaandeFotos)
+                    {
+                        <div class="col-4 mb-3 foto-item position-relative" onclick="toggleFotoSelectie(this)">
+                            <img src="@foto.AfbeeldingBase64" class="img-thumbnail foto-select" />
+                            <input type="checkbox" class="form-check-input position-absolute top-0 end-0 m-2 checkbox-hidden" name="FotosToDelete" value="@foto.Id" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Foto toevoegen of verwijderen -->
+            <div class="box">
+                <h5>Acties</h5>
+                <div class="d-flex align-items-end">
+                    <div class="me-3 w-75">
+                        <label class="form-label">Nieuwe foto's uploaden</label>
+                        <input type="file" name="FotoFiles" multiple class="form-control" />
+                    </div>
+                    <div class="d-flex flex-column align-items-start w-25">
+                        <label class="form-label">Verwijder geselecteerde foto's</label>
+                        <button type="button" class="btn btn-danger mt-2 w-100" onclick="verwijderGeselecteerdeFotos()">Verwijder</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opslaan knop -->
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group mt-4">
+                <input type="submit" value="Opslaan" class="btn btn-primary" />
+                <a asp-action="Beheer" class="btn btn-secondary ms-2">Naar bestemmingbeheer</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    // Function to update the label and set min/max leeftijd
+    function updateLeeftijdCategorie(value) {
+        let categorieLabel = document.getElementById('categorieLabel');
+        let minLeeftijdField = document.getElementById('MinLeeftijd');
+        let maxLeeftijdField = document.getElementById('MaxLeeftijd');
+
+        switch (value) {
+            case '1':
+                categorieLabel.textContent = '10-12 jaar';
+                minLeeftijdField.value = 10;
+                maxLeeftijdField.value = 12;
+                break;
+            case '2':
+                categorieLabel.textContent = '13-15 jaar';
+                minLeeftijdField.value = 13;
+                maxLeeftijdField.value = 15;
+                break;
+            case '3':
+                categorieLabel.textContent = '16-18 jaar';
+                minLeeftijdField.value = 16;
+                maxLeeftijdField.value = 18;
+                break;
+        }
+    }
+
+    // Initialize the label and values on document load
+    document.addEventListener("DOMContentLoaded", function () {
+        let dropdown = document.getElementById('leeftijdCategorie');
+        updateLeeftijdCategorie(dropdown.value);
+    });
+
+    // Function to remove selected photos
+    function verwijderGeselecteerdeFotos() {
+        let checkboxes = document.querySelectorAll('input[name="FotosToDelete"]:checked');
+        checkboxes.forEach(checkbox => {
+            let fotoItem = checkbox.closest('.foto-item');
+            fotoItem.classList.add('d-none');
+            checkbox.disabled = false;
+        });
+    }
+
+    // Functie om een foto te selecteren of deselecteren
+    function toggleFotoSelectie(fotoItem) {
+        fotoItem.classList.toggle('selected');
+        const checkbox = fotoItem.querySelector('.checkbox-hidden');
+        checkbox.checked = fotoItem.classList.contains('selected');
+    }
+</script>

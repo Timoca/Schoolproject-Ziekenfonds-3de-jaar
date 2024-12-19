@@ -1,0 +1,241 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisDetailViewModel
+@{
+    ViewBag.Title = Model.BestemmingNaam;
+}
+
+﻿<div class="container mt-5">
+   
+    <div class="row">
+        <!-- Rechterkolom -->
+        <div class="col-md-3 order-md-2">
+            <!-- Succes- of foutmeldingen -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <!-- Inschrijvingsknop voor deelnemer -->
+            @if (User.IsInRole("Gebruiker") || User.IsInRole("Deelnemer"))
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header text-center bg-darkblue text-white">
+                        <h5>Inschrijven</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <form asp-action="Inschrijven" asp-controller="Groepsreis" method="get">
+                            <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary w-100">
+                                @(Model.IsVolzet ? "Voeg je kinderen toe aan de wachtlijst" : "Schrijf je kinderen in")
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <!-- Deelnemerslijst knop -->
+            @if (Model.IsEenHoofdmonitor)
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        <form asp-action="LijstDeelnemers" asp-controller="Groepsreis" method="get">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-info w-100 fa fa-users">Deelnemerslijst</button>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <!-- Monitorenlijst knop -->
+            @if (Model.IsMonitor || Model.IsEenHoofdmonitor)
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        <form asp-action="LijstMonitoren" asp-controller="Groepsreis" method="get">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success w-100 fa fa-user-tie">Monitorenlijst</button>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <!-- Kandidaat stellen als monitor of hoofdmonitor -->
+            @if (User.IsInRole("Monitor"))
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        <form asp-action="KandidaatStellenAlsMonitor" asp-controller="Groepsreis" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary w-100">Kandidaat stellen als monitor</button>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            @if (User.IsInRole("Hoofdmonitor"))
+            {
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body text-center">
+                        <form asp-action="KandidaatStellenAlsMonitor" asp-controller="Groepsreis" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary w-100">Kandidaat stellen als monitor</button>
+                        </form>
+                        <form asp-action="KandidaatStellenAlsHoofdmonitor" asp-controller="Groepsreis" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger w-100">Kandidaat stellen als hoofdmonitor</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Linkerkolom -->
+        <div class="col-md-9 order-md-1">
+            @if (Model.IsGeannuleerd)
+            {
+                <div class="alert alert-danger">
+                    <strong>Deze groepsreis is geannuleerd.</strong>
+                </div>
+            }
+            <!-- Detailinformatie -->
+            <div class="text-center mb-4">
+                <h1>@Model.BestemmingNaam</h1>
+                <p class="lead">@Model.BestemmingBeschrijving</p>
+            </div>
+
+            <div class="card shadow-sm mb-5">
+                <div class="card-body">
+                    <p class="fs-5"><strong>Prijs:</strong> € @Model.Prijs.ToString("0.00")</p>
+                    <p class="fs-5"><strong>Leeftijdscategorie:</strong> @Model.MinLeeftijd - @Model.MaxLeeftijd jaar</p>
+                    <p class="fs-5"><strong>Periode:</strong> @Model.Begindatum.ToString("dd MMM yyyy") - @Model.Einddatum.ToString("dd MMM yyyy")</p>
+                </div>
+            </div>
+
+            <!-- Foto gallerij -->
+            <h3 class="mb-4">Foto's</h3>
+            <div id="fotoCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    @for (int i = 0; i < Model.FotoBase64Strings.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#fotoCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
+                    }
+                </div>
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.FotoBase64Strings.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@Model.FotoBase64Strings[i]" class="d-block w-100 img-fluid rounded" alt="Foto van @Model.BestemmingNaam" style="object-fit: cover; height: 400px;" onclick="openModal('@Model.FotoBase64Strings[i]')">
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#fotoCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Vorige</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#fotoCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Volgende</span>
+                </button>
+            </div>
+
+            <!-- Modaal voor vergroting -->
+            <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" style="max-width: 75vw; max-height: 75vh; width: 75vw;">
+                    <div class="modal-content" style="height: 75vh;">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="fotoModalLabel">Een impressie van @Model.BestemmingNaam</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-0" style="height: calc(100% - 56px);">
+                            <img id="modalImage" src="" class="w-100 h-100" alt="Een impressie van @Model.BestemmingNaam" style="object-fit: cover; padding: 20px">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activiteitenlijst -->
+            <h3 class="mb-4">Activiteiten</h3>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var activiteit in Model.Activiteiten)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="fs-5 me-auto">
+                                    <div class="fw-bold">@activiteit.Naam</div>
+                                    <small>@activiteit.Beschrijving</small>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Onkosten -->
+            @if ((Model.IsVerantwoordelijke || Model.IsEenHoofdmonitor))
+            {
+                <h3 class="mt-4">Onkosten</h3>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        @if (Model.IsEenHoofdmonitor)
+                        {
+                            <div>
+                                <a asp-action="Create" asp-controller="Onkosten" asp-route-groepsreisId="@Model.Id" class="btn btn-success">
+                                    Onkosten invoeren
+                                </a>
+                                <a asp-action="Index" asp-controller="Onkosten" asp-route-groepsreisId="@Model.Id" class="btn btn-darkblue">
+                                    Bekijk alle onkosten
+                                </a>
+                            </div>
+                        }
+                        @if (Model.IsVerantwoordelijke)
+                        {
+                            <p class="fs-5 mt-2">Overzicht van alle kosten voor deze groepsreis.</p>
+                            <div>
+                                <a asp-action="Beheer" asp-controller="Onkosten" asp-route-id="@Model.Id" class="btn btn-darkblue">
+                                    Onkosten beheren
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Terug knop-->
+            <div class="text-start mt-5">
+                <div class="text-start mt-5">
+                    @if (ViewData["Referer"] != null && ViewData["Referer"].ToString().Contains("/Groepsreis/Index"))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">Ga terug</a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-secondary" type="button" onclick="window.history.back()">Ga terug</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(fotoSrc) {
+        // Vul de modaal met de geselecteerde foto
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = fotoSrc;
+
+        // Open de modaal
+        const fotoModal = new bootstrap.Modal(document.getElementById('fotoModal'));
+        fotoModal.show();
+    }
+</script>

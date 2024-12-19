@@ -1,0 +1,32 @@
+﻿@model Groepsreizen_team_tet.ViewModels.BestemmingViewModels.BestemmingBeheerViewModel
+
+<h1>Beheer bestemmingen</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Code</th>
+            <th>Actie</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bestemming in Model.Bestemmingen)
+        {
+            <tr>
+                <td>@bestemming.Naam</td>
+                <td>@bestemming.Code</td>
+                <td>
+                    <!-- Knoppen voor acties: Wijzigen en Verwijderen -->
+                    <a asp-action="Edit" asp-route-id="@bestemming.Id" class="btn btn-warning btn-sm" title="Bestemming bewerken">
+                        <i class="fa fa-pencil-alt"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-controller="Groepsreis" asp-action="Beheer" class="btn btn-secondary">Terug naar de lijst met groepsreizen</a>
+</div>

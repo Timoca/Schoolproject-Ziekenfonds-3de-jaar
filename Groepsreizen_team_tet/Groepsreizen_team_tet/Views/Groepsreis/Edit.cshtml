@@ -1,0 +1,80 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisEditViewModel
+
+<div class="container">
+    <h1 class="mb-4">Bewerk Groepsreis</h1>
+    <div class="card shadow-sm p-4 mb-5 bg-white rounded">
+        <form asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <!-- Begindatum -->
+            <div class="form-group mb-3">
+                <label asp-for="Begindatum" class="form-label fw-bold"></label>
+                <input asp-for="Begindatum" class="form-control" type="date" />
+                <span asp-validation-for="Begindatum" class="text-danger"></span>
+            </div>
+
+            <!-- Einddatum -->
+            <div class="form-group mb-3">
+                <label asp-for="Einddatum" class="form-label fw-bold"></label>
+                <input asp-for="Einddatum" class="form-control" type="date" />
+                <span asp-validation-for="Einddatum" class="text-danger"></span>
+            </div>
+
+            <!-- Prijs -->
+            <div class="form-group mb-3">
+                <label asp-for="Prijs" class="form-label fw-bold"></label>
+                <input asp-for="Prijs" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Prijs" class="text-danger"></span>
+            </div>
+
+            <!-- Deelnemerslimiet -->
+            <div class="form-group mb-3">
+                <label asp-for="Deelnemerslimiet" class="form-label fw-bold">Deelnemerslimiet</label>
+                <input asp-for="Deelnemerslimiet" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Deelnemerslimiet" class="text-danger"></span>
+            </div>
+
+            <!-- Bestemming selectie -->
+            <div class="form-group mb-3">
+                <label asp-for="BestemmingId" class="form-label fw-bold"></label>
+                <div class="input-group">
+                    <select asp-for="BestemmingId" class="form-control" asp-items="Model.Bestemmingen">
+                        <option value="">-- Selecteer een bestemming --</option>
+                    </select>
+                </div>
+                <span asp-validation-for="BestemmingId" class="text-danger"></span>
+            </div>
+
+            <!-- Bestemming bewerken -->
+            <div class="form-group mb-3">
+                <a asp-controller="Bestemming" asp-action="Edit" asp-route-id="@Model.BestemmingId" class="btn btn-warning">
+                    Bewerk Bestemming
+                </a>
+            </div>
+
+            <!-- Activiteiten selectie -->
+            <div class="form-group mb-3">
+                <label asp-for="GeselecteerdeActiviteiten" class="form-label fw-bold">Activiteiten</label>
+                <div class="input-group">
+                    <select asp-for="GeselecteerdeActiviteiten" class="form-control" asp-items="Model.Activiteiten" multiple="multiple"></select>
+                </div>
+                <span asp-validation-for="GeselecteerdeActiviteiten" class="text-danger"></span>
+                <small class="text-end d-block">Tip: houdt CTRL ingedrukt om meerdere activiteiten te selecteren.</small>
+            </div>
+
+            <!-- Opslaan knop -->
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group mt-4">
+                <input type="submit" value="Opslaan" class="btn btn-primary" />
+                <a asp-action="Beheer" class="btn btn-secondary ms-2">Terug naar overzicht</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

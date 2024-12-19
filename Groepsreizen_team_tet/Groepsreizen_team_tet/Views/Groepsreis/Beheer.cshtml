@@ -1,0 +1,153 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisBeheerViewModel
+@{
+    ViewBag.Title = "Groepsreizenbeheer";
+}
+
+<h2>
+    @if (Model.ToonGearchiveerd)
+    {
+        <span>Gearchiveerde Groepsreizen</span>
+    }
+    else
+    {
+        <span>Actuele Groepsreizen</span>
+    }
+</h2>
+
+<div class="row mb-3">
+    <!-- Box voor acties -->
+    <div class="col-12 col-md-9">
+        <div class="box">
+            <h5>Acties</h5>
+            <div>
+                <a asp-action="Create" class="btn btn-success mb-1">Nieuwe groepsreis aanmaken</a>
+                <a asp-controller="Bestemming" asp-action="Beheer" class="btn btn-primary mb-1">Beheer bestemming</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Box voor archiefbeheer -->
+    <div class="col-12 col-md-3">
+        <div class="box">
+            <h5>Archiefbeheer</h5>
+            <div class="btn-group mb-3" role="group" aria-label="Reizen filteren">
+                <a asp-action="Beheer" asp-route-filter="actueel"
+                   class="btn @(ViewBag.Filter == "actueel" ? "btn-primary" : "btn-outline-secondary")">Actuele reizen</a>
+                <a asp-action="Beheer" asp-route-filter="onkosten"
+                   class="btn @(ViewBag.Filter == "onkosten" ? "btn-primary" : "btn-outline-secondary")">Onkosten</a>
+                <a asp-action="Beheer" asp-route-filter="archiveren"
+                   class="btn @(ViewBag.Filter == "archiveren" ? "btn-primary" : "btn-outline-secondary")">Archief</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Bestemming</th>
+            <th>Code</th>
+            <th>Prijs</th>
+            <th>Startdatum</th>
+            <th>Einddatum</th>
+            <th>Aantal Deelnemers</th>
+            <th>Aantal Wachtlijst</th>
+            <th>Min Leeftijd</th>
+            <th>Max Leeftijd</th>
+
+            @if (ViewBag.Filter == "archiveren")
+            {
+                <th>Status</th>
+            }
+            @if (ViewBag.Filter == "actueel" || ViewBag.Filter == "archiveren")
+            {
+                <th>Acties</th>
+            }
+            @if (ViewBag.Filter == "onkosten")
+            {
+                <th>Onkosten Valideren</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var groepsreis in Model.Groepsreizen)
+        {
+            <tr>
+                <td>
+                    @if(groepsreis.IsKopie){
+                        <a asp-action="Detail" asp-route-id="@groepsreis.Id">
+                            @groepsreis.BestemmingNaam Kopie
+                        </a>
+                    }
+                    else{
+                        <a asp-action="Detail" asp-route-id="@groepsreis.Id">
+                            @groepsreis.BestemmingNaam
+                        </a>
+                    }
+                </td>
+                <td>@groepsreis.BestemmingCode</td>
+                <td>€ @groepsreis.Prijs.ToString("0.00")</td>
+                <td>@groepsreis.Begindatum.ToString("dd MMM yyyy")</td>
+                <td>@groepsreis.Einddatum.ToString("dd MMM yyyy")</td>
+                <td>@groepsreis.AantalDeelnemers/@groepsreis.Deelnemerslimiet</td>
+                <td>@groepsreis.AantalWachtlijst</td>
+                <td>@groepsreis.MinLeeftijd</td>
+                <td>@groepsreis.MaxLeeftijd</td>
+                @if (ViewBag.Filter == "archiveren")
+                {
+                    <td>
+                        <!-- Statusknop voor gearchiveerde reizen -->
+                        @if (groepsreis.IsGeannuleerd)
+                        {
+                            <button class="btn btn-danger btn-sm" disabled>Geannuleerd</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-sm" disabled>Afgelopen</button>
+                        }
+                    </td>
+                    <td>
+                        <!-- Knoppen voor archiefbeheer -->
+                        <a asp-action="LijstDeelnemers" asp-route-id="@groepsreis.Id" class="btn btn-info btn-sm" title="Deelnemers weergeven">
+                            <i class="fa fa-users"></i>
+                        </a>
+                        <a asp-action="LijstMonitoren" asp-route-id="@groepsreis.Id" class="btn btn-success btn-sm" title="Monitoren weergeven">
+                            <i class="fa fa-user-tie"></i>
+                        </a>
+                    </td>
+                }
+
+                else if (ViewBag.Filter == "actueel")
+                {
+                    <td>
+                        <!-- Knoppen voor actuele reizen -->
+                        <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-warning btn-sm" title="Groepsreis wijzigen">
+                            <i class="fa fa-pencil-alt"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@groepsreis.Id" class="btn btn-danger btn-sm" title="Groepsreis verwijderen">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                        <a asp-action="BeheerDeelnemers" asp-route-id="@groepsreis.Id" class="btn btn-info btn-sm" title="Deelnemers beheren">
+                            <i class="fa fa-users"></i>
+                        </a>
+                        <a asp-action="BeheerMonitoren" asp-route-id="@groepsreis.Id" class="btn btn-success btn-sm" title="Monitoren beheren">
+                            <i class="fa fa-user-tie"></i>
+                        </a> 
+                        <a asp-action="AnnuleerGroepsreis" asp-route-groepsreisId="@groepsreis.Id" class="btn btn-dark btn-sm" title="Groepsreis annuleren">
+                            <i class="fa fa-ban"></i>
+                        </a>
+                    </td>
+                }
+               
+                else if (ViewBag.Filter == "onkosten" && !groepsreis.OnkostenIngegeven && groepsreis.Einddatum < DateTime.Today)
+                {
+                    <td>
+                        <form asp-action="ValideerOnkosten" asp-route-id="@groepsreis.Id" method="post">
+                            <button type="submit" class="btn btn-success btn-sm">Valideer Onkosten</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

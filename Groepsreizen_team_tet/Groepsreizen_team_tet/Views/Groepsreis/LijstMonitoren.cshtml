@@ -1,0 +1,32 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisMonitorenViewModel
+
+<div class="container mt-4">
+    <h2>Monitorenlijst voor @Model.BestemmingNaam</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr class="table-info">
+                    <th>Naam</th>
+                    <th>Leeftijd</th>
+                    <th>E-mailadres</th>
+                    <th>Telefoonnummer</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var monitor in Model.IngeschrevenMonitoren)
+                {
+                    <tr>
+                        <td>@monitor.Naam</td>
+                        <td>@monitor.Leeftijd jaar</td>
+                        <td>@monitor.Email</td>
+                        <td>@monitor.Telefoonnummer</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- Terug knop-->
+    <div class="mt-4">
+        <button onclick="window.history.back()" class="btn btn-secondary">Terug</button>
+    </div>
+</div>

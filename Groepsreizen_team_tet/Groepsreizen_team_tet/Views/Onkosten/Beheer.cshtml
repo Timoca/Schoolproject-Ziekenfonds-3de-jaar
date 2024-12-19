@@ -1,0 +1,170 @@
+﻿@model OnkostenBeheerViewModel
+@{
+    ViewBag.Title = "Onkostenbeheer " + @Model.GroepsreisNaam;
+}
+
+<h2>Onkostenbeheer voor groepsreis @Model.GroepsreisNaam</h2>
+
+<!-- Row met twee cards -->
+<div class="row mb-4">
+    <!-- Linker card: Opbrengst en budget hoofdmonitor -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Financieel overzicht</h5>
+                <p><strong>Opbrengst:</strong> <span>@Model.Opbrengst.ToString("C")</span></p>
+                <p><strong>Kosten:</strong> <span>@Model.Totaalkost.ToString("C")</span></p>
+                <p>
+                    <strong>Balans:</strong>
+                    <span class="@(Model.Balans < 0 ? "text-danger" : "")">
+                        @Model.Balans.ToString("C")
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Midden card: Onkosten verantwoordelijke -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Onkosten verantwoordelijke</h5>
+                <p><strong>Onkosten verantwoordelijke:</strong> <span>@Model.OnkostenVerantwoordelijke.ToString("C")</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rechter card: Onkosten hoofdmonitor -->
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">Onkosten hoofdmonitor</h5>
+                <p><strong>Budget hoofdmonitor:</strong> <span>@Model.BudgetHoofdmonitor.ToString("C")</span></p>
+                <p><strong>Uitgaven hoofdmonitor:</strong> <span>@Model.OnkostenHoofdmonitor.ToString("C")</span></p>
+                <p>
+                    <strong>Balans:</strong>
+                    <span class="@(Model.BalansHM < 0 ? "text-danger" : "")">
+                        @Model.BalansHM.ToString("C")
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Overzicht van alle onkosten</h3>
+
+<!-- Accordion voor onkosten -->
+<div class="accordion">
+    <!-- Accordion item 1: Onkosten hoofdmonitor -->
+    <div class="accordion-item">
+        <h4 class="accordion-header" id="headingHoofdmonitor">
+            <button class="accordion-button" style="font-size: large; font-weight: bold; background-color: #00839b; color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHoofdmonitor" aria-expanded="true" aria-controls="collapseHoofdmonitor">
+                Onkosten hoofdmonitor
+            </button>
+        </h4>
+        <div id="collapseHoofdmonitor" class="accordion-collapse collapse show" aria-labelledby="headingHoofdmonitor">
+            <div class="accordion-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Titel</th>
+                            <th>Omschrijving</th>
+                            <th>Bedrag</th>
+                            <th>Betaalbewijs</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var onkost in Model.OnkostenHoofdmonitorLijst)
+                        {
+                            <tr>
+                                <td>@onkost.Datum.ToString("dd-MM-yyyy")</td>
+                                <td>@onkost.Titel</td>
+                                <td>@onkost.Omschrijving</td>
+                                <td>@onkost.Bedrag.ToString("C")</td>
+                                <td>
+                                    @if (onkost.Betaalbewijs != null)
+                                    {
+                                        <img src="data:image/png;base64,@Convert.ToBase64String(onkost.Betaalbewijs)" alt="Betaalbewijs van uitgave" style="width:100px; height:auto;" />
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Detail" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-info" title="Bekijken">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-warning" title="Bewerken">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-danger" title="Verwijderen">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion item 2: Onkosten verantwoordelijke -->
+    <div class="accordion-item">
+        <h4 class="accordion-header" id="headingVerantwoordelijke">
+            <button class="accordion-button" style="font-size: large; font-weight: bold; background-color: #00839b; color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVerantwoordelijke" aria-expanded="false" aria-controls="collapseVerantwoordelijke">
+                Onkosten verantwoordelijke
+            </button>
+        </h4>
+        <div id="collapseVerantwoordelijke" class="accordion-collapse collapse show" aria-labelledby="headingVerantwoordelijke">
+            <div class="accordion-body">
+                @if (!Model.IsGeannuleerd)
+                {
+                    <div class="d-flex justify-content-end mb-3">
+                        <a asp-action="Create" asp-controller="Onkosten" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-success">
+                        Nieuwe onkost toevoegen
+                    </a>
+                </div>
+                }
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Datum</th>
+                            <th>Titel</th>
+                            <th>Omschrijving</th>
+                            <th>Bedrag</th>
+                            <th>Acties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var onkost in Model.OnkostenVerantwoordelijkeLijst)
+                        {
+                            <tr>
+                                <td>@onkost.Datum.ToString("dd-MM-yyyy")</td>
+                                <td>@onkost.Titel</td>
+                                <td>@onkost.Omschrijving</td>
+                                <td>@onkost.Bedrag.ToString("C")</td>
+                                <td>
+                                    <a asp-action="Detail" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-info" title="Bekijken">
+                                        <i class="fas fa-search"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-warning" title="Bewerken">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-controller="Onkosten" asp-route-id="@onkost.Id" class="btn btn-danger" title="Verwijderen">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terugknop naar groepsreis detailpagina -->
+<div class="mt-4">
+    <a asp-action="Detail" asp-controller="Groepsreis" asp-route-id="@Model.GroepsreisId" class="btn btn-secondary">Terug naar groepsreis</a>
+</div>

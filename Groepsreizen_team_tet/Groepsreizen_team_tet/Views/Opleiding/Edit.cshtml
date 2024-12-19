@@ -1,0 +1,64 @@
+﻿@model OpleidingEditViewModel
+@{
+    ViewBag.Title = "Opleiding Bewerken";
+}
+
+<h3>Opleiding bewerken: @Model.Naam</h3>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-2">
+        <label asp-for="Naam" class="form-label"></label>
+        <input asp-for="Naam" class="form-control" />
+        <span asp-validation-for="Naam" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Beschrijving" class="form-label"></label>
+        <textarea asp-for="Beschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Beschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Begindatum" class="form-label"></label>
+        <input asp-for="Begindatum" class="form-control" type="date" />
+        <span asp-validation-for="Begindatum" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Einddatum" class="form-label"></label>
+        <input asp-for="Einddatum" class="form-control" type="date" />
+        <span asp-validation-for="Einddatum" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="AantalPlaatsen" class="form-label">Aantal plaatsen</label>
+        <input asp-for="AantalPlaatsen" class="form-control" />
+        <span asp-validation-for="AantalPlaatsen" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Locatie" class="form-label"></label>
+        <input asp-for="Locatie" class="form-control" />
+        <span asp-validation-for="Locatie" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="OpleidingVereistId" class="form-label">Vereiste vooropleiding</label>
+        <select asp-for="OpleidingVereistId" asp-items="@(new SelectList(Model.OpleidingVereisten, "Id", "Naam"))" class="form-control">
+            <option value="">Geen vereiste vooropleiding</option>
+        </select>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Afbeelding" class="form-label">Afbeelding</label>
+        <input asp-for="Afbeelding" class="form-control" />
+        <span asp-validation-for="Afbeelding" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-darkblue mt-3">Opslaan</button>
+</form>
+
+<div>
+    <a asp-action="Beheer" class="btn btn-secondary mt-3">Terug naar overzicht</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

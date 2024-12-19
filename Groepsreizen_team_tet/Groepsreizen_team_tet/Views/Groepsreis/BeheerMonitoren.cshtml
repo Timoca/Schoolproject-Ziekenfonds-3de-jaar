@@ -1,0 +1,128 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisMonitorenViewModel
+@{
+    ViewBag.Title = "Ingeschreven monitoren";
+}
+
+<div class="container mt-4">
+       @if (!Model.IsGeannuleerd)
+    {
+        <div class="card">
+        <div class="card-header text-white">
+            <h2><i class="fas fa-user-tie"></i> Monitoren beheren voor @Model.BestemmingNaam</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="BeheerMonitoren" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="GroepsreisId" />
+
+                <!-- Beschikbare Monitoren Selectie -->
+                <div class="form-group">
+                    <label for="GeselecteerdeMonitorenIds">Selecteer Monitoren:</label>
+                    <select asp-for="GeselecteerdeMonitorenIds" asp-items="Model.BeschikbareMonitoren" multiple class="form-control" style="height: 200px;">
+                        @if (!Model.BeschikbareMonitoren.Any())
+                        {
+                            <option disabled>Geen beschikbare monitoren</option>
+                        }
+                    </select>
+                    <small class="text-end d-block">Tip: houdt CTRL ingedrukt om meerdere monitoren te selecteren.</small>
+                </div>
+
+                <!-- Selecteer Hoofdmonitor -->
+                <div class="form-group mt-3">
+                    <label for="GeselecteerdeHoofdmonitorId">Selecteer Hoofdmonitor:</label>
+                    <select asp-for="GeselecteerdeHoofdmonitorId" asp-items="Model.BeschikbareHoofdmonitoren" class="form-control">
+                        <option value="">-- Selecteer Hoofdmonitor --</option>
+                    </select>
+                </div>
+
+                <!-- Opslaan/Annuleren Knoppen -->
+                <button type="submit" class="btn btn-success mt-3">
+                    <i class="fas fa-save"></i> Opslaan
+                </button>
+                <a asp-action="Beheer" class="btn btn-secondary mt-3">
+                    <i class="fas fa-times"></i> Annuleren
+                </a>
+            </form>
+        </div>
+    </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <strong>Deze groepsreis is geannuleerd.</strong> Er kunnen geen nieuwe monitoren meer worden toegevoegd.
+        </div>
+    }
+    <!-- Lijst van Huidige Monitoren -->
+    @if (Model.HuidigeMonitoren.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3><i class="fas fa-list"></i> Huidige Monitoren</h3>
+            </div>
+            <div class="card-body">
+                @if (Model.HuidigeMonitoren.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var monitor in Model.HuidigeMonitoren)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@monitor.Persoon.Voornaam @monitor.Persoon.Naam</strong>
+                                    <p class="mb-0"><em>Leeftijd:</em> @(DateTime.Now.Year - monitor.Persoon.Geboortedatum.Year)</p>
+                                    @if (monitor.IsHoofdMonitor == 0)
+                                    {
+                                        <span class="badge bg-info">Monitor</span>
+                                    }
+                                    @if (monitor.IsHoofdMonitor == 1)
+                                    {
+                                        <span class="badge bg-primary">Hoofdmonitor</span>
+                                    }
+                                </div>
+                                <form asp-action="VerwijderMonitor" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="monitorId" value="@monitor.Id" />
+                                    <button type="submit" class="btn btn-danger">Verwijderen</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Geen monitoren toegevoegd aan deze groepsreis.</p>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+<script>
+    function verwijderMonitor(monitorId) {
+        if (confirm("Weet je zeker dat je deze monitor wilt verwijderen?")) {
+            // Haal de anti-forgery-token op
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Maak een formulier aan en stuur een POST-verzoek
+            const form = document.createElement("form");
+            form.method = "post";
+            form.action = "/Groepsreis/VerwijderMonitor";
+
+            const monitorIdInput = document.createElement("input");
+            monitorIdInput.type = "hidden";
+            monitorIdInput.name = "monitorId";
+            monitorIdInput.value = monitorId;
+
+            const tokenInput = document.createElement("input");
+            tokenInput.type = "hidden";
+            tokenInput.name = "__RequestVerificationToken";
+            tokenInput.value = token;
+
+            form.appendChild(monitorIdInput);
+            form.appendChild(tokenInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+</script>

@@ -1,0 +1,292 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisCreateViewModel
+
+<div class="container mt-5">
+    <h1 class="text-center">Reizen</h1>
+    <h3 class="text-center mb-4">Maak een nieuwe groepsreis aan</h3>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card card-custom p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Begindatum -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Begindatum" class="form-label fw-bold"></label>
+                        <input asp-for="Begindatum" class="form-control" type="date" value="@DateTime.Now.AddMonths(2).ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="Begindatum" class="text-danger"></span>
+                    </div>
+
+                    <!-- Einddatum -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Einddatum" class="form-label fw-bold"></label>
+                        <input asp-for="Einddatum" class="form-control" type="date" value="@DateTime.Now.AddMonths(2).AddDays(7).ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="Einddatum" class="text-danger"></span>
+                    </div>
+
+                    <!-- Prijs -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Prijs" class="form-label fw-bold"></label>
+                        <input asp-for="Prijs" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Prijs" class="text-danger"></span>
+                    </div>
+
+                    <!-- Deelnemerslimiet -->
+                    <div class="form-group mb-3">
+                        <label asp-for="Deelnemerslimiet" class="form-label fw-bold">Deelnemerslimiet</label>
+                        <input asp-for="Deelnemerslimiet" class="form-control" type="number" placeholder="1" min="1" />
+                        <span asp-validation-for="Deelnemerslimiet" class="text-danger"></span>
+                    </div>
+
+                    <!-- Bestemming -->
+                    <div class="form-group mb-3">
+                        <label asp-for="BestemmingId" class="form-label fw-bold">Selecteer een bestemming</label>
+                        <select asp-for="BestemmingId" class="form-select" asp-items="Model.Bestemmingen"></select>
+                        <span asp-validation-for="BestemmingId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Nieuwe bestemming knop -->
+                    <div class="mb-3 text-center">
+                        <button type="button" class="btn btn-darkblue" data-bs-toggle="modal" data-bs-target="#nieuweBestemmingModal">
+                            Nieuwe bestemming toevoegen
+                        </button>
+                    </div>
+
+                    <!-- Activiteiten selectie -->
+                    <div class="form-group mb-3">
+                        <label asp-for="GeselecteerdeActiviteiten" class="form-label fw-bold">Selecteer activiteiten</label>
+                        <select asp-for="GeselecteerdeActiviteiten" class="form-select" asp-items="Model.Activiteiten" multiple></select>
+                        <span asp-validation-for="GeselecteerdeActiviteiten" class="text-danger"></span>
+                        <small class="text-end d-block">Tip: houdt CTRL ingedrukt om meerdere activiteiten te selecteren.</small>
+                    </div>
+
+                    <!-- Nieuwe activiteit knop -->
+                    <div class="mb-4 text-center">
+                        <button type="button" class="btn btn-darkblue" data-bs-toggle="modal" data-bs-target="#nieuweActiviteitModal">
+                            Nieuwe activiteit toevoegen
+                        </button>
+                    </div>
+
+                    <!-- Opslaan knop -->
+                    <div class="d-grid">
+                        <input type="submit" value="Maak nieuwe reis aan" class="btn btn-darkblue btn-lg" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-action="Beheer" class="btn btn-secondary btn-lg">Terug naar de lijst</a>
+    </div>
+</div>
+
+<!-- Modaal voor nieuwe bestemming -->
+<div class="modal fade" id="nieuweBestemmingModal" tabindex="-1" aria-labelledby="nieuweBestemmingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content card-custom">
+            <div class="modal-header bg-darkblue text-white">
+                <h5 class="modal-title" id="nieuweBestemmingModalLabel">Nieuwe bestemming aanmaken</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nieuweBestemmingForm" method="post" enctype="multipart/form-data">
+
+                    <!-- Naam van de bestemming -->
+                    <div class="form-group mb-3">
+                        <label for="Naam" class="form-label">Naam van de bestemming</label>
+                        <input type="text" class="form-control" id="Naam" name="Naam" required />
+                    </div>
+
+                    <!-- Code van de bestemming -->
+                    <div class="form-group mb-3">
+                        <label for="Code" class="form-label">Bestemmingscode</label>
+                        <input type="text" class="form-control" id="Code" name="Code" required />
+                    </div>
+
+                    <!-- Beschrijving van de bestemming -->
+                    <div class="form-group mb-3">
+                        <label for="Beschrijving" class="form-label">Beschrijving van de bestemming</label>
+                        <textarea class="form-control" id="Beschrijving" name="Beschrijving" required></textarea>
+                    </div>
+
+                    <!-- Leeftijdscategorie -->
+                    <div class="form-group mb-3">
+                        <label for="LeeftijdCategorie" class="form-label">Selecteer een leeftijdscategorie</label>
+                        <select class="form-select" id="LeeftijdCategorie" name="LeeftijdCategorie" oninput="updateLeeftijdCategorie(this.value)">
+                            <option value="1">10-12 jaar</option>
+                            <option value="2">13-15 jaar</option>
+                            <option value="3">16-18 jaar</option>
+                        </select>
+                        <div class="d-flex justify-content-between">
+                            <span id="categorieLabel"></span>
+                        </div>
+                    </div>
+                    <input type="hidden" name="MinLeeftijd" id="MinLeeftijd" value="@(Model.MinLeeftijd)" />
+                    <input type="hidden" name="MaxLeeftijd" id="MaxLeeftijd" value="@(Model.MaxLeeftijd)" />
+
+                    <!-- Foto's toevoegen' -->
+                    <div class="form-group mb-3">
+                        <label for="FotoFile" class="form-label">Upload een foto</label>
+                        <input type="file" class="form-control" id="FotoFile" name="FotoFile" multiple/>
+                        <small class="text-end d-block">Tip: houdt CTRL ingedrukt om meerdere foto's te selecteren.</small>
+                    </div>
+
+                    <!-- Opslaan knop -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-darkblue btn-lg">Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modaal voor nieuwe activiteit -->
+<div class="modal fade" id="nieuweActiviteitModal" tabindex="-1" aria-labelledby="nieuweActiviteitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content card-custom">
+            <div class="modal-header bg-darkblue text-white">
+                <h5 class="modal-title" id="nieuweActiviteitModalLabel">Nieuwe activiteit aanmaken</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Naam van de activiteit -->
+            <div class="modal-body">
+                <form id="nieuweActiviteitForm" method="post">
+                    <div class="form-group mb-3">
+                        <label for="Naam" class="form-label">Naam van de activiteit</label>
+                        <input type="text" class="form-control" id="Naam" name="Naam" required />
+                    </div>
+
+                    <!-- Beschrijving van de activiteit -->
+                    <div class="form-group mb-3">
+                        <label for="Beschrijving" class="form-label">Beschrijving van de activiteit</label>
+                        <textarea class="form-control" id="Beschrijving" name="Beschrijving" required></textarea>
+                    </div>
+
+                    <!-- Opslaan knop -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-darkblue btn-lg">Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    // Set default values for dates (today and +2 months)
+    let beginDatum = new Date();
+    beginDatum.setMonth(beginDatum.getMonth() + 2);
+    document.getElementById("Begindatum").valueAsDate = beginDatum;
+    let eindDatum = new Date();
+    eindDatum.setMonth(eindDatum.getMonth() + 2);
+    eindDatum.setDate(eindDatum.getDate() + 7);
+    document.getElementById("Einddatum").valueAsDate = eindDatum;
+
+    // Function to update the label of the slider and set the min and max leeftijd
+    function updateLeeftijdCategorie(value) {
+        let categorieLabel = document.getElementById('categorieLabel');
+        let minLeeftijdField = document.getElementById('MinLeeftijd');
+        let maxLeeftijdField = document.getElementById('MaxLeeftijd');
+
+        switch (value) {
+            case '1':
+                categorieLabel.textContent = '10-12 jaar';
+                minLeeftijdField.value = 10;
+                maxLeeftijdField.value = 12;
+                break;
+            case '2':
+                categorieLabel.textContent = '13-15 jaar';
+                minLeeftijdField.value = 13;
+                maxLeeftijdField.value = 15;
+                break;
+            case '3':
+                categorieLabel.textContent = '16-18 jaar';
+                minLeeftijdField.value = 16;
+                maxLeeftijdField.value = 18;
+                break;
+        }
+    }
+
+    // Initialize the label and values based on the initial slider value
+    window.onload = function () {
+        let dropdown = document.getElementById('leeftijdCategorie');
+        updateLeeftijdCategorie(dropdown.value);
+    }
+
+    // AJAX form submission for the modal
+    document.getElementById('nieuweBestemmingForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+
+        fetch('@Url.Action("CreateGroepsreisModal", "Bestemming")', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json()) // Converteer de response naar JSON
+            .then(data => {
+                if (data.success) {
+                    // Sluit de modal en voeg de nieuwe bestemming toe aan de dropdown
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('nieuweBestemmingModal'));
+                    modal.hide();
+                    let bestemmingSelect = document.querySelector('select[name="BestemmingId"]');
+                    let newOption = new Option(data.bestemmingNaam, data.bestemmingId, false, true);
+                    bestemmingSelect.add(newOption);
+
+                    // Velden leegmaken
+                    document.getElementById('nieuweBestemmingForm').reset();
+
+                    // Eventueel een succesmelding
+                    console.log('Nieuwe bestemming toegevoegd!');
+                } else {
+                    // Toon een foutmelding als de foto al bestaat
+                    alert(data.error || 'Er is een fout opgetreden bij het toevoegen van de bestemming.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // AJAX form submission for nieuwe activiteit
+    document.getElementById('nieuweActiviteitForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+
+        fetch('@Url.Action("CreateGroepsreisModal", "Activiteit")', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Sluit de modal en voeg de nieuwe activiteit toe aan de dropdown
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('nieuweActiviteitModal'));
+                    modal.hide();
+
+                    let activiteitSelect = document.querySelector('select[name="GeselecteerdeActiviteiten"]');
+                    let newOption = new Option(data.activiteitNaam, data.activiteitId, false, true);
+                    activiteitSelect.add(newOption);
+
+                    // Velden leegmaken
+                    document.getElementById('nieuweActiviteitForm').reset();
+
+                    // Eventueel een succesmelding
+                    console.log('Nieuwe activiteit toegevoegd!');
+                } else {
+                    // Toon een foutmelding
+                    console.log(data.errors.join("\n") || 'Er is een fout opgetreden bij het toevoegen van de activiteit.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>

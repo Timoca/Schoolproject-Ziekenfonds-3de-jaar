@@ -1,0 +1,33 @@
+@model List<Groepsreizen_team_tet.ViewModels.DeelnemerViewModels.DeelnemerViewModel>
+
+    <h1>Deelnemerslijst</h1>
+
+    <!-- Tabel met alle deelnemers -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Kind Naam</th>
+                <th>Kind Voornaam</th>
+                <th>Email Ouder</th>
+                <th>Groepsreis</th>
+                <th>Opmerkingen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var deelnemer in Model)
+            {
+                <tr>
+                    <td>@deelnemer.NaamKind</td>
+                    <td>@deelnemer.VoornaamKind</td>
+                    <td>@deelnemer.EmailOuder</td>
+                    <td>@deelnemer.GroepsreisNaam</td>
+                    <td>@deelnemer.Opmerkingen</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<!-- Terug knop-->
+<div class="text-start mt-5">
+    <button class="btn btn-outline-secondary" type="button" onclick="history.back()">Ga terug</button>
+</div>

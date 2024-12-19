@@ -1,0 +1,61 @@
+﻿@model Groepsreizen_team_tet.ViewModels.MonitorViewModels.MonitorCreateViewModel
+@{
+    ViewData["Title"] = "Monitor Toevoegen";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+
+<!-- Zoekformulier -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" asp-action="Create" class="d-flex">
+        <div class="form-group me-2">
+            <input type="text" name="searchString" value="@Model.SearchString" class="form-control" placeholder="Filter op naam..." />
+        </div>
+        <button type="submit" class="btn btn-darkblue me-2">Filter</button>
+        <a asp-action="Create" class="btn btn-secondary">Reset</a>
+    </form>
+</div>
+
+<!-- Zoekresultaten Tabel -->
+@if (Model.Gebruikers.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Naam</th>
+                <th>Leeftijd</th>
+                <th>Rol</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var gebruiker in Model.Gebruikers)
+            {
+                <tr>
+                    <td>@gebruiker.Email</td>
+                    <td>@gebruiker.Naam @gebruiker.Voornaam</td>
+                    <td>@gebruiker.Leeftijd</td>
+                    <td>@gebruiker.Role</td>
+                    <td>
+                        <form asp-action="Add" method="post" style="display:inline;">
+                            <input type="hidden" name="userId" value="@gebruiker.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">
+                                <i class="fa fa-plus"></i> Toevoegen als Monitor
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!string.IsNullOrEmpty(Model.SearchString))
+{
+    <p>Geen gebruikers gevonden met de opgegeven criteria.</p>
+}
+
+<div class="mt-5">
+    <a asp-action="Vorige" class="btn btn-secondary">Vorige</a>
+</div>

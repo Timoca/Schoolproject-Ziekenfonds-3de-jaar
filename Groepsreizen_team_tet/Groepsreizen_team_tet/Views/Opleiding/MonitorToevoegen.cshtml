@@ -1,0 +1,34 @@
+﻿@model OpleidingMonitorToevoegenViewModel
+
+<h2>Monitor Toevoegen voor Opleiding: @Model.OpleidingNaam</h2>
+
+@if (TempData["Melding"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["Melding"]
+    </div>
+}
+
+@if (TempData["Foutmelding"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Foutmelding"]
+    </div>
+}
+
+<form asp-action="MonitorToevoegenBevestigen" method="post">
+    <input type="hidden" name="opleidingId" value="@Model.OpleidingId" />
+    <div class="form-group">
+        <label for="geselecteerdeMonitorId">Beschikbare Monitoren:</label>
+        <select id="geselecteerdeMonitorId" name="geselecteerdeMonitorId" class="form-control">
+            @foreach (var monitor in Model.BeschikbareMonitoren)
+            {
+                <option value="@monitor.Id">@monitor.Naam (@monitor.Email)</option>
+            }
+        </select>
+    </div>
+    <div class="form-group mt-3">
+        <input type="submit" value="Monitor Toevoegen" class="btn btn-success" />
+        <a asp-action="DetailVerantwoordelijke" asp-route-id="@Model.OpleidingId" class="btn btn-secondary">Annuleren</a>
+    </div>
+</form>

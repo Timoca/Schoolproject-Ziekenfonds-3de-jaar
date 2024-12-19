@@ -1,0 +1,128 @@
+﻿@model Groepsreizen_team_tet.ViewModels.BestemmingViewModels.BestemmingEditViewModel
+
+<div class="modal-header bg-darkblue text-white">
+    <h5 class="modal-title">Bewerk Bestemming</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <form id="editBestemmingForm">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <!-- Naam van de bestemming -->
+        <div class="mb-3">
+            <label asp-for="Naam" class="form-label">Naam</label>
+            <input asp-for="Naam" class="form-control" type="text" />
+            <span asp-validation-for="Naam" class="text-danger"></span>
+        </div>
+
+        <!-- Code van de bestemming -->
+        <div class="mb-3">
+            <label asp-for="Code" class="form-label">Code</label>
+            <input asp-for="Code" class="form-control" type="text" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+
+        <!-- Beschrijving van de bestemming -->
+        <div class="mb-3">
+            <label asp-for="Beschrijving" class="form-label">Beschrijving</label>
+            <textarea asp-for="Beschrijving" class="form-control"></textarea>
+            <span asp-validation-for="Beschrijving" class="text-danger"></span>
+        </div>
+
+        <!-- Leeftijdscategorie -->
+        <div class="mb-3">
+            <label for="LeeftijdCategorie" class="form-label">Selecteer een leeftijdscategorie</label>
+            <select asp-for="LeeftijdCategorie" class="form-select" id="leeftijdCategorie" oninput="updateLeeftijdCategorie(this.value)">
+                <option value="1">10-12 jaar</option>
+                <option value="2">13-15 jaar</option>
+                <option value="3">16-18 jaar</option>
+            </select>
+            <div class="d-flex justify-content-between">
+                <span id="categorieLabel"></span>
+            </div>
+        </div>
+        <input type="hidden" asp-for="MinLeeftijd" id="MinLeeftijd" />
+        <input type="hidden" asp-for="MaxLeeftijd" id="MaxLeeftijd" />
+
+        <!-- Bestaande foto's tonen of verwijderen -->
+        <div class="mb-3">
+            <label class="form-label">Bestaande foto's</label>
+            <div class="row">
+                @foreach (var foto in Model.BestaandeFotos)
+                {
+                    <div class="col-4 mb-3">
+                        <img src="@foto.AfbeeldingBase64" class="img-thumbnail" />
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="FotosToDelete" value="@foto.Id" />
+                            <label class="form-check-label">Verwijderen</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Nieuwe foto's toevoegen -->
+        <div class="mb-3">
+            <label class="form-label">Nieuwe foto's uploaden</label>
+            <input type="file" name="FotoFiles" multiple class="form-control" />
+        </div>
+
+        <!-- Opslaan knop -->
+        <button type="submit" class="btn btn-primary">Opslaan</button>
+    </form>
+</div>
+
+<script>
+    // Function to update the label and set min/max leeftijd
+    function updateLeeftijdCategorie(value) {
+        let categorieLabel = document.getElementById('categorieLabel');
+        let minLeeftijdField = document.getElementById('MinLeeftijd');
+        let maxLeeftijdField = document.getElementById('MaxLeeftijd');
+
+        switch (value) {
+            case '1':
+                categorieLabel.textContent = '10-12 jaar';
+                minLeeftijdField.value = 10;
+                maxLeeftijdField.value = 12;
+                break;
+            case '2':
+                categorieLabel.textContent = '13-15 jaar';
+                minLeeftijdField.value = 13;
+                maxLeeftijdField.value = 15;
+                break;
+            case '3':
+                categorieLabel.textContent = '16-18 jaar';
+                minLeeftijdField.value = 16;
+                maxLeeftijdField.value = 18;
+                break;
+        }
+    }
+
+    // Initialize the label and values on document load
+    document.addEventListener("DOMContentLoaded", function () {
+        let dropdown = document.getElementById('leeftijdCategorie');
+        updateLeeftijdCategorie(dropdown.value);
+    });
+
+    // AJAX form submission to save the edited bestemming
+    document.getElementById("editBestemmingForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(this);
+
+        fetch('/Bestemming/EditModal', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Bestemming succesvol bewerkt');
+                    bootstrap.Modal.getInstance(document.getElementById("bewerkBestemmingModal")).hide();
+                } else {
+                    alert(data.errors.join("\n") || 'Er is een fout opgetreden.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>

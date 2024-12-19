@@ -1,0 +1,34 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisDeleteViewModel
+
+<div class="container mt-5">
+    <!-- Hoofding -->
+    <div class="text-center mb-4">
+        <h1>Verwijder Groepsreis</h1>
+        <p class="lead text-muted">Weet u zeker dat u deze groepsreis wilt verwijderen?</p>
+    </div>
+
+    <!-- Groepsreis info card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h3 class="card-title">@Model.BestemmingNaam</h3>
+            <p class="card-text">
+                <strong>Prijs:</strong> € Model.Prijs.ToString("0.00")<br>
+                <strong>Startdatum:</strong> @Model.Begindatum.ToString("dd MMM yyyy")<br>
+                <strong>Einddatum:</strong> @Model.Einddatum.ToString("dd MMM yyyy")
+            </p>
+        </div>
+    </div>
+
+    <!-- Acties -->
+    <div class="text-center">
+        <form asp-action="Delete" method="post" class="d-inline">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2" onclick="return confirm('Weet u zeker dat u deze groepsreis wilt verwijderen?');">
+                <i class="fas fa-trash-alt"></i> Verwijderen
+            </button>
+        </form>
+        <a asp-action="Beheer" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuleren
+        </a>
+    </div>
+</div>

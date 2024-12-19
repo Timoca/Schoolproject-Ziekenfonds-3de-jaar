@@ -1,0 +1,118 @@
+﻿@model Groepsreizen_team_tet.ViewModels.HomeViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="home__content">
+    <div class="row">
+        <!-- Left Column with the Image -->
+        <div class="col-md-6">
+            <img src="/images/hero.jpg" alt="Hero Image" class="img-fluid" />
+        </div>
+
+        <!-- Right Column with the Heading and Text -->
+        <div class="col-md-6">
+            <h3>Groepsreizen</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur malesuada nunc dolor, eu feugiat nulla volutpat nec.
+                Maecenas sit amet neque at ex commodo volutpat a in enim. Etiam faucibus ut leo vel pharetra.
+                Mauris mauris elit, varius non risus quis, tincidunt mattis odio.
+                Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+            </p>
+        </div>
+    </div>
+
+    <!-- Groepsreizen Overzicht -->
+    <div class="row" style="margin-top: 30px">
+        <h3>Ons aanbod</h3>        
+@if (Model.Groepsreizen.Any())
+        {
+            @foreach (var groepsreis in Model.Groepsreizen)
+            {
+                if (groepsreis.Bestemming != null)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100">
+                            <!-- Als er foto's zijn, toon de eerste -->
+                            @if (groepsreis.Bestemming.Fotos.Any())
+                            {
+                                var eersteFoto = groepsreis.Bestemming.Fotos.First();
+                                var base64Afbeelding = eersteFoto.Afbeelding != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(eersteFoto.Afbeelding)}" : null;
+
+                                if (base64Afbeelding != null)
+                                {
+                                    <img src="@base64Afbeelding" class="card-img-top" alt="Foto van @groepsreis.Bestemming.Naam" style="max-height: 200px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Placeholder afbeelding">
+                                }
+                            }
+                            else
+                            {
+                                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Placeholder afbeelding">
+                            }
+
+                            <div class="card-body">
+                                <h5 class="card-title">@groepsreis.Bestemming.Naam</h5>
+                                <span class="short-description">
+                                    @if (groepsreis.Bestemming.Beschrijving.Length > 100)
+                                    {
+                                        @(groepsreis.Bestemming.Beschrijving.Substring(0, 100) + "...")
+                                    }
+                                    else
+                                    {
+                                        @groepsreis.Bestemming.Beschrijving
+                                    }
+                                </span>
+                                <span class="full-description d-none">
+                                    @groepsreis.Bestemming.Beschrijving
+                                </span>
+                                @if (groepsreis.Bestemming.Beschrijving.Length > 100)
+                                {
+                                    <a href="javascript:void(0);" class="toggle-description btn btn-link p-0">Toon meer</a>
+                                }
+                                <p class="card-text">
+                                    <strong>Prijs:</strong> € @groepsreis.Prijs.ToString("0.00") <br />
+                                    <strong>Data:</strong> @groepsreis.Begindatum.ToString("dd MMM yyyy") - @groepsreis.Einddatum.ToString("dd MMM yyyy") <br />
+                                    <strong>Leeftijd:</strong> @groepsreis.Bestemming.MinLeeftijd - @groepsreis.Bestemming.MaxLeeftijd jaar
+                                </p>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-darkblue">Meer Info</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <p class="text-center">Er zijn geen reizen beschikbaar.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    // Toon meer indien de beschrijving langer is dan 100 karakters
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.toggle-description').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const cardBody = button.closest('.card-body');
+                cardBody.querySelector('.short-description').classList.toggle('d-none');
+                cardBody.querySelector('.full-description').classList.toggle('d-none');
+
+                // Toggle the button text
+                if (button.innerText === 'Toon meer') {
+                    button.innerText = 'Toon minder';
+                } else {
+                    button.innerText = 'Toon meer';
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,201 @@
+﻿@model Groepsreizen_team_tet.ViewModels.GroepsreisViewModels.GroepsreisViewModel
+@{
+    ViewData["Title"] = "Beschikbare Reizen";
+}
+
+<!-- noUiSlider CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Beschikbare Reizen</h1>
+    <div class="row">
+        <!-- Filters aan de linkerkant van het scherm -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filter formulier -->
+                    <form asp-action="FilterReizen" method="post">
+                        <!-- Startdatum filter -->
+                        <div class="form-group mb-3">
+                            <label for="StartDatum" class="form-label">Startdatum</label>
+                            <input type="date" class="form-control" id="StartDatum" name="StartDatum" value="@Model.StartDatum?.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <!-- Einddatum filter -->
+                        <div class="form-group mb-3">
+                            <label for="EindDatum" class="form-label">Einddatum</label>
+                            <input type="date" class="form-control" id="EindDatum" name="EindDatum" value="@Model.EindDatum?.ToString("yyyy-MM-dd")" />
+                        </div>
+
+                        <!-- Leeftijdscategorie slider -->
+                        <div class="form-group mb-3">
+                            <label for="rangeSlider" class="form-label">Leeftijdsbereik</label>
+                            <div class="rangeSlider mb-3"></div>
+                            <div>
+                                <span>Geselecteerd bereik: </span>
+                                <span id="rangeMin"></span> - <span id="rangeMax"></span>
+                            </div>
+                            <input type="hidden" id="MinLeeftijd" name="MinLeeftijd" />
+                            <input type="hidden" id="MaxLeeftijd" name="MaxLeeftijd" />
+                        </div>
+
+                        <!-- Filter- en resetknop -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-darkblue">Filter</button>
+                            <a asp-action="ResetFilters" class="btn btn-secondary">Reset Filters</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Groepsreizen aan de rechter kant van het scherm -->
+        <div class="col-md-8">
+            <div class="row row-cols-2">
+                @if (Model.Groepsreizen.Any())
+                {
+                    @foreach (var groepsreis in Model.Groepsreizen)
+                    {
+                        if (groepsreis.Bestemming != null)
+                        {
+                            <div class="col mb-4">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <!-- Toon de eerst beschikbare foto -->
+                                    @if (groepsreis.Bestemming.Fotos.Any())
+                                    {
+                                        <img src="data:image/png;base64,@Convert.ToBase64String(groepsreis.Bestemming.Fotos.First().Afbeelding)" class="card-img-top" alt="Foto van @groepsreis.Bestemming.Naam" style="max-height: 200px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Placeholder afbeelding" style="max-height: 200px; object-fit: cover;">
+                                    }
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">@groepsreis.Bestemming.Naam</h5>
+                                        <p class="card-text description">
+                                            <span class="short-description">
+                                                @if (groepsreis.Bestemming.Beschrijving.Length > 100)
+                                                {
+                                                    @(groepsreis.Bestemming.Beschrijving.Substring(0, 100) + "...")
+                                                }
+                                                else
+                                                {
+                                                    @groepsreis.Bestemming.Beschrijving
+                                                }
+                                            </span>
+                                            <span class="full-description d-none">
+                                                @groepsreis.Bestemming.Beschrijving
+                                            </span>
+                                            @if (groepsreis.Bestemming.Beschrijving.Length > 100)
+                                            {
+                                                <a href="javascript:void(0);" class="toggle-description btn btn-link p-0">Toon meer</a>
+                                            }
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Prijs:</strong> € @groepsreis.Prijs.ToString("0.00") <br />
+                                            <strong>Data:</strong> @groepsreis.Begindatum.ToString("dd MMM yyyy") - @groepsreis.Einddatum.ToString("dd MMM yyyy") <br />
+                                            <strong>Leeftijd:</strong> @groepsreis.Bestemming.MinLeeftijd - @groepsreis.Bestemming.MaxLeeftijd jaar
+                                        </p>
+                                    </div>
+
+                                    <div class="card-footer text-center">
+                                        @if (groepsreis.Deelnemers.Count < groepsreis.Deelnemerslimiet)
+                                        {
+                                            <span class="text-success d-block">
+                                                @groepsreis.Deelnemers.Count / @groepsreis.Deelnemerslimiet plaatsen beschikbaar
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger d-block">Schrijf je in op de wachtlijst</span>
+                                        }
+                                        <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-darkblue mt-2">Meer Info</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <p class="text-center">Er zijn geen reizen beschikbaar met de geselecteerde filters.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.js"></script>
+<script>
+    // Functie om het label van de slider te updaten
+    document.addEventListener("DOMContentLoaded", function () {
+        var rangeSlider = document.querySelector(".rangeSlider");
+
+        // Haal de waarden uit het Model op en converteer ze naar JavaScript-waarden
+        var minValue = @(@Model.MinLeeftijd.HasValue ? Model.MinLeeftijd.ToString() : "10");
+        var maxValue = @(@Model.MaxLeeftijd.HasValue ? Model.MaxLeeftijd.ToString() : "18");
+
+        // Zorg ervoor dat je minValue en maxValue omvormt naar numerieke waarden
+        minValue = parseInt(minValue);
+        maxValue = parseInt(maxValue);
+
+        // Maak de slider aan met de waarden vanuit het model
+        noUiSlider.create(rangeSlider, {
+            start: [minValue, maxValue],
+            connect: true,
+            range: {
+                'min': 10,
+                'max': 18
+            },
+            tooltips: false,
+            step: 1
+        });
+
+        var rangeMinLabel = document.getElementById("rangeMin");
+        var rangeMaxLabel = document.getElementById("rangeMax");
+
+        // Update de inputvelden en labels wanneer de slider wordt verplaatst
+        rangeSlider.noUiSlider.on('update', function (values, handle) {
+            document.getElementById("MinLeeftijd").value = Math.round(values[0]);
+            document.getElementById("MaxLeeftijd").value = Math.round(values[1]);
+            rangeMinLabel.innerHTML = Math.round(values[0]);
+            rangeMaxLabel.innerHTML = Math.round(values[1]);
+        });
+
+        // Stel de beginwaarden in op de labels en hidden inputs
+        rangeMinLabel.innerHTML = minValue;
+        rangeMaxLabel.innerHTML = maxValue;
+        document.getElementById("MinLeeftijd").value = minValue;
+        document.getElementById("MaxLeeftijd").value = maxValue;
+    });
+
+    // Initialize on window load
+    window.onload = function () {
+        let slider = document.querySelector(".rangeSlider");
+        updateLeeftijdCategorie(slider.value);
+    }
+
+    // Toon meer indien de beschrijving langer is dan 100 karakters
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.toggle-description').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const cardBody = button.closest('.card-body');
+                cardBody.querySelector('.short-description').classList.toggle('d-none');
+                cardBody.querySelector('.full-description').classList.toggle('d-none');
+
+                // Toggle the button text
+                if (button.innerText === 'Toon meer') {
+                    button.innerText = 'Toon minder';
+                } else {
+                    button.innerText = 'Toon meer';
+                }
+            });
+        });
+    });
+</script>
+

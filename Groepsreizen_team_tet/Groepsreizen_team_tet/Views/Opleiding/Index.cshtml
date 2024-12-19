@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Groepsreizen_team_tet.ViewModels.OpleidingViewModels.OpleidingIndexViewModel>
+
+@{
+    ViewBag.Title = "Aanbod Opleidingen";
+}
+
+<h2>Aanbod toekomstige opleidingen</h2>
+
+@if (TempData["Succesmelding"] != null)
+{
+    <div class="alert alert-success">@TempData["Succesmelding"]</div>
+}
+@if (TempData["Foutmelding"] != null)
+{
+    <div class="alert alert-danger">@TempData["Foutmelding"]</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Locatie</th>
+            <th>Beschrijving</th>
+            <th>Vooropleiding</th>
+            <th>Beschikbare plaatsen</th>
+            <th>Begindatum</th>
+            <th>Einddatum</th>
+            <th>Informatie</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var opleiding in Model)
+        {
+            <tr>
+                <td>@opleiding.Naam</td>
+                <td>@opleiding.Locatie</td>              
+                <td>@opleiding.Beschrijving</td>
+                <td>@opleiding.Vooropleiding</td>
+                <td>@opleiding.BeschikbarePlaatsen/@opleiding.AantalPlaatsen</td>
+                <td>@opleiding.Begindatum.ToString("dd-MM-yyyy")</td>
+                <td>@opleiding.Einddatum.ToString("dd-MM-yyyy")</td>
+                <td>
+                    <a asp-action="DetailMonitor" asp-route-id="@opleiding.Id" class="btn btn-info btn-sm" style="min-width: 100px;">
+                        <i class="fa fa-search"></i> Details
+                    </a>                   
+                </td>
+                <td>
+                    @if (opleiding.IsIngeschreven)
+                    {
+                        <span class="btn btn-success btn-sm" style="min-width: 100px;">Ingeschreven</span>
+                    }
+                    else if (opleiding.BeschikbarePlaatsen > 0)
+                    {
+                        <a asp-action="Inschrijven" asp-route-id="@opleiding.Id" class="btn btn-primary btn-sm" style="min-width: 100px;">
+                            <i class="fa fa-plus"></i> Inschrijven
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-sm" disabled style="min-width: 100px;">Volzet</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

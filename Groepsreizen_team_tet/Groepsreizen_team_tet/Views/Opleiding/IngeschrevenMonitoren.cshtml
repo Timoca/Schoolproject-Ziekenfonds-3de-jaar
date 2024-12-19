@@ -1,0 +1,50 @@
+﻿@model OpleidingIngeschrevenMonitorenViewModel
+@{
+    ViewBag.Title = "Inschrijvingen";
+}
+
+<h3>Ingeschreven monitoren voor: @Model.OpleidingNaam</h3>
+
+<div class="mb-3">
+    <a asp-action="MonitorToevoegen" asp-route-id="@Model.OpleidingId" class="btn btn-success">
+        <i class="fa fa-plus"></i> Monitor Toevoegen
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Email</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var monitor in Model.IngeschrevenMonitoren)
+        {
+            <tr>
+                <td>@monitor.Naam</td>
+                <td>@monitor.Email</td>
+                <td>
+                    <a asp-action="VerwijderMonitor" asp-route-opleidingId="@Model.OpleidingId" asp-route-monitorId="@monitor.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Beheer" class="btn btn-secondary">Terug naar overzicht</a>

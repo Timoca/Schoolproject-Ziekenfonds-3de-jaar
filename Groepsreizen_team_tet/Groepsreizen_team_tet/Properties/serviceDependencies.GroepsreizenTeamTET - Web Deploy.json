@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/Groepsreizenteamtetapi/apis/Groepsreizenteamtet",
+      "type": "apis.azure"
+    },
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('serviceConnectorResourceGroupName')]/providers/Microsoft.Web/sites/GroepsreizenTeamTET/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsGroepsreizenContext_9BAF681B25",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/groepsreizen-team-tetdbserver/databases/Groepsreizen_team_tet_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:GroepsreizenContext"
+    }
+  }
+}

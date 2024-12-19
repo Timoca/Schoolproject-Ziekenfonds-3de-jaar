@@ -1,0 +1,41 @@
+﻿@model Opleiding
+
+@{
+    ViewBag.Title = "Inschrijven voor Opleiding";
+}
+
+<h2>Inschrijven voor @Model.Naam</h2>
+
+<p>Je staat op het punt om je in te schrijven voor de opleiding: @Model.Naam.</p>
+
+<p>Locatie: @Model.Locatie</p>
+<p>Begindatum: @Model.Begindatum.ToString("dd-MM-yyyy")</p>
+<p>Aantal beschikbare plaatsen: @Model.BeschikbarePlaatsen/@Model.AantalPlaatsen</p>
+
+@if (Model.OpleidingVereist != null)
+{
+    <div class="form-group mb-3">
+        <label>
+            <input type="checkbox" id="basiscursusAfgerond" /> Ik heb de basiscursus (@Model.OpleidingVereist.Naam) gevolgd.
+        </label>
+    </div>
+}
+
+<form asp-action="InschrijvenBevestigen"  method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group d-flex gap-2 mt-3">
+        <input type="submit" value="Inschrijving bevestigen" class="btn btn-success" id="bevestigenButton" @(Model.OpleidingVereist != null ? "disabled" : "") />
+        <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        const basiscursusCheckbox = document.getElementById("basiscursusAfgerond");
+        if (basiscursusCheckbox) {
+            basiscursusCheckbox.addEventListener("change", function () {
+                document.getElementById("bevestigenButton").disabled = !this.checked;
+            });
+        }
+    </script>
+}

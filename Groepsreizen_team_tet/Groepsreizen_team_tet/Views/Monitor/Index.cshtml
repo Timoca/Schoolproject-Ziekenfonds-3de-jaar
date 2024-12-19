@@ -1,0 +1,35 @@
+@model IEnumerable<Groepsreizen_team_tet.ViewModels.MonitorViewModels.MonitorViewModel>
+<h2>Monitors</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">Nieuwe monitor toevoegen</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Email</th>
+            <th>Is Hoofdmonitor</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var monitor in Model)
+        {
+            <tr>
+                <td>@monitor.Voornaam @monitor.Naam</td>
+                <td>@monitor.Email</td>
+                <td>@(monitor.IsHoofdMonitor == true ? "Ja" : "Nee")</td>
+                <td>
+                    <!-- knoppen voor acties Details en Bewerken -->
+                    <a asp-action="Detail" asp-route-id="@monitor.Id" class="btn btn-info btn-sm me-1">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@monitor.Id" class="btn btn-warning btn-sm">
+                        <i class="fa fa-pencil-alt"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="ToDashboard" class="btn btn-secondary mb-3">Terug naar dashboard</a>
+

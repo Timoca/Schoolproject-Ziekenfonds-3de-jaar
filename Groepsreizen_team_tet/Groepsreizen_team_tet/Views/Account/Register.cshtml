@@ -1,0 +1,134 @@
+﻿@model Groepsreizen_team_tet.ViewModels.AccountViewModels.RegisterViewModel
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center">Account Aanmaken</h2>
+
+            <!-- Validation Summary -->
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert  alert-info">
+                    @Html.ValidationSummary(excludePropertyErrors: true, "Er is een fout opgetreden:")
+                </div>
+            }
+
+            <form asp-action="Register" method="post">
+
+                <!-- Naam en Voornaam -->
+                <div class="form-row row mt-3">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Naam"></label>
+                        <input asp-for="Naam" class="form-control" />
+                        <span asp-validation-for="Naam" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Voornaam"></label>
+                        <input asp-for="Voornaam" class="form-control" />
+                        <span asp-validation-for="Voornaam" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Straat en Huisnummer -->
+                <div class="form-row row mt-2">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Straat"></label>
+                        <input asp-for="Straat" class="form-control" />
+                        <span asp-validation-for="Straat" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Huisnummer"></label>
+                        <input asp-for="Huisnummer" class="form-control" />
+                        <span asp-validation-for="Huisnummer" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Gemeente en Postcode -->
+                <div class="form-row row mt-2">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Gemeente"></label>
+                        <input asp-for="Gemeente" class="form-control" />
+                        <span asp-validation-for="Gemeente" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Postcode"></label>
+                        <input asp-for="Postcode" class="form-control" />
+                        <span asp-validation-for="Postcode" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Geboortedatum en telefoonnummer -->
+                <div class="form-row row mt-2">
+                    <div class="form-group col-md-6">
+                        <label asp-for="Geboortedatum"></label>
+                        <input asp-for="Geboortedatum" class="form-control" type="date" />
+                        <span asp-validation-for="Geboortedatum" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="Telefoonnummer"></label>
+                        <input asp-for="Telefoonnummer" class="form-control"/>
+                        <span asp-validation-for="Telefoonnummer" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Huisdokter -->
+                <div class="form-group mt-2">
+                    <label asp-for="Huisdokter"></label>
+                    <input asp-for="Huisdokter" class="form-control" />
+                    <span asp-validation-for="Huisdokter" class="text-danger"></span>
+                </div>
+
+                <!-- Contractnummer-->
+                <div class="form-group mt-2">
+                    <label asp-for="ContractNummer"></label>
+                    <input asp-for="ContractNummer" class="form-control" />
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        Enkel voor leden.
+                    </small>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group mt-2">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Paswoord -->
+                <div class="form-group mt-2">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        Het wachtwoord moet minstens 6 tekens bevatten, waaronder een hoofdletter, een cijfer en een speciaal teken.
+                    </small>
+                </div>
+
+
+
+                <!-- Bevestig Paswoord -->
+                <div class="form-group mt-2">
+                    <label asp-for="ConfirmPassword"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <!-- Submit Knop -->
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn w-100 btn-darkblue">Account Aanmaken</button>
+                </div>
+            </form>
+            <div class="mt-3 text-center">
+                <p>Heb je al een account? <a asp-action="Login">Log hier in</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,53 @@
+﻿@model OpleidingBeheerViewModel
+@{
+    ViewBag.Title = "Opleidingbeheer";
+}
+
+<h2>Opleidingbeheer</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">Nieuwe opleiding aanmaken</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Locatie</th>
+            <th>Beschrijving</th>
+            <th>Vooropleiding</th>
+            <th>Begindatum</th>
+            <th>Einddatum</th>
+            <th>Beschikbare plaatsen</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var opleiding in Model.Opleidingen)
+        {
+            <tr>
+                <td>@opleiding.Naam</td>
+                <td>@opleiding.Locatie</td>
+                <td>@opleiding.Beschrijving</td>
+                <td>@(opleiding.OpleidingVereist != null ? opleiding.OpleidingVereist.Naam : "Geen")</td>
+                <td>@opleiding.Begindatum.ToString("dd-MM-yyyy")</td>
+                <td>@opleiding.Einddatum.ToString("dd-MM-yyyy")</td>
+                <td>@opleiding.BeschikbarePlaatsen/@opleiding.AantalPlaatsen</td>               
+                <td>
+                    <div class="d-flex">
+                        <a asp-action="IngeschrevenMonitoren" asp-route-id="@opleiding.Id" class="btn btn-success btn-sm me-1">
+                            <i class="fa fa-user-tie"></i>
+                        </a>
+                        <a asp-action="DetailVerantwoordelijke" asp-route-id="@opleiding.Id" class="btn btn-info btn-sm me-1">
+                            <i class="fas fa-search"></i> 
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@opleiding.Id" class="btn btn-warning btn-sm me-1">
+                            <i class="fa fa-pencil-alt"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@opleiding.Id" class="btn btn-danger btn-sm me-1">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
